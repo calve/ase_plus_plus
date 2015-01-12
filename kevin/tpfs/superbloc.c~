@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct superbloc_s super;
+extern struct superbloc_s super;
 unsigned current_volume;
 
 void init_super(unsigned int vol,unsigned int num_serie, char nom[32])

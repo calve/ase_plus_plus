@@ -12,11 +12,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "super.h"
+#include "superbloc.h"
 #include "inode.h"
 #include "tools.h"
 #include "ifile.h"
 #include "dir.h"
+
+#define min(a,b) (a<=b?a:b)
 
 /*------------------------------
   Private entry manipulation.
@@ -78,15 +80,14 @@ add_entry(unsigned int idir, unsigned int inumber, const char *basename)
     struct entry_s entry; 
     unsigned int ientry = 0;
     int nbyte; 
-    int status;
     
     /* a directory inode? */
     read_inode(idir, &inode); 
-    if (inode.ind_type != directory) 
+    if (inode.type != FILE_DIRECTORY) 
 	return RETURN_FAILURE;
     
     /* open the dir */
-    iopen_ifile(fd, idir, &inode);
+    open_ifile(fd, idir);
 
     /* the new entry position in the file */
     ientry = new_entry(fd);
@@ -122,11 +123,11 @@ del_entry(unsigned int idir, const char *basename)
     
     /* a directory inode? */
     read_inode(idir, &inode); 
-    if (inode.ind_type != directory) 
+    if (inode.type != FILE_DIRECTORY) 
 	return RETURN_FAILURE;
     
     /* open the dir */
-    iopen_ifile(fd, idir, &inode);
+    open_ifile(fd, idir);
 
     /* the entry position in the file */
     status = find_entry(fd, basename);
@@ -170,11 +171,11 @@ inumber_of_basename(unsigned int idir, const char *basename)
     
     /* a directory inode? */
     read_inode(idir, &inode);
-    if (inode.ind_type != directory) 
+    if (inode.type != FILE_DIRECTORY) 
 	return 0;
 
     /* open the dir */
-    iopen_ifile(fd, idir, &inode);
+    open_ifile(fd, idir);
 
     /* the entry position in the file */
     status = find_entry(fd, basename);
@@ -203,7 +204,7 @@ inumber_of_path(const char *pathname)
 	return 0;
 
     /* start at root */
-    icurrent = super.super_root;
+    icurrent = super.numero;
     
     while (*pathname) {
 	if (*pathname != '/') {
@@ -261,7 +262,7 @@ dinumber_of_path(const char *pathname, const char **basename)
 
     /* is dirname a directory? */
     read_inode(idirname, &inode); 
-    if (inode.ind_type != directory)
+    if (inode.type != FILE_DIRECTORY)
 	idirname = 0; 
 
  free:

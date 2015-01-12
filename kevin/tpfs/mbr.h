@@ -38,7 +38,9 @@ void create_volume(unsigned int cylinder, unsigned int sector, unsigned int nsec
 void delete_volume(unsigned int number);
 void init_mbr();
 
+/*
 char char_of_vol_type(enum vol_type_e);
 enum vol_type_e vol_type_of_char(char);
+*/
 
 #endif

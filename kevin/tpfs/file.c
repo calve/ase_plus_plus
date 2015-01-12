@@ -8,7 +8,7 @@
 */
 
 #include "mbr.h"
-#include "super.h"
+#include "superbloc.h"
 #include "ifile.h"
 #include "dir.h"
 #include "file.h"

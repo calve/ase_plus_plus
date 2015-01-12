@@ -10,7 +10,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
-#include "ifile.h"
+#include "file.h"
 #include "mount.h"
 
 static void
@@ -31,7 +31,7 @@ nfile()
     while((c=getchar()) != EOF)
         writec_ifile(&fd, c);
 
-    close_ifile(&fd);
+    close_file(&fd);
 }
 
 static void
