@@ -1,6 +1,7 @@
 AUTHOR_NAME = debusschere
 FIELD_NAME = ase
 TP_INDEX = 3
+SHELL = /bin/bash
 
 # $Id: Makefile,v 1.2 2004/10/12 09:06:17 marquet Exp $
 ##############################################################################
