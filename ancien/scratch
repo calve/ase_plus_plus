@@ -1,0 +1,19 @@
+/* Taken live from tp */
+unsigned int new_bloc(){
+  unsigned int res;
+  struct free_bloc_s fb;
+  if (super.free_size == 0) return BLOC_NULL;
+  read_nbloc(current_val, super.first_free, &fb, sizeof…);
+  res = super.first_free;
+  super.first_free = fb.next;
+  super.free.size--;
+  return res;
+}
+
+void free_bloc(unsigned int b){
+  struct free_bloc_s fb;
+  fb.next = super.first_free;
+  write_nbloc(current_volume, b, & fb, sizeof…);
+  super.free_size++;
+  super.first_free = b;
+}
