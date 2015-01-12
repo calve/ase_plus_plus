@@ -4,7 +4,7 @@
 
    File manipulation. The main library interface.
    Philippe Marquet, october 2002
-   
+
 */
 
 #include "mbr.h"
@@ -21,19 +21,19 @@ int
 create_file(const char *pathname, enum file_type_e type)
 {
     unsigned int idir;
-    unsigned int inumber; 
+    unsigned int inumber;
     const char *basename;
     int status;
-    
+
     /* does the directory exist? */
-    idir = dinumber_of_path(pathname, &basename); 
+    idir = dinumber_of_path(pathname, &basename);
     if (! idir)
-	return RETURN_FAILURE;
+        return RETURN_FAILURE;
 
     /* create the file */
     inumber = create_ifile(type);
     if (! inumber)
-	return RETURN_FAILURE;
+        return RETURN_FAILURE;
 
     /*  link the file in his directory */
     status = add_entry(idir, inumber, basename);
@@ -47,15 +47,15 @@ delete_file(const char *pathname)
     unsigned int idir;
     const char *basename;
     int status;
-    
+
     /* does the directory exist? */
-    idir = dinumber_of_path(pathname, &basename); 
+    idir = dinumber_of_path(pathname, &basename);
     if (! idir)
-	return RETURN_FAILURE;
+        return RETURN_FAILURE;
 
     /* suppress the entry in the directory */
-    status = del_entry(idir, basename); 
-    
+    status = del_entry(idir, basename);
+
     return status;
 }
 
@@ -66,15 +66,15 @@ delete_file(const char *pathname)
 int
 open_file(file_desc_t *fd, const char *pathname)
 {
-    unsigned int inumber; 
+    unsigned int inumber;
     int status;
 
-    /* convert the pathname into an inumber */  
+    /* convert the pathname into an inumber */
     inumber = inumber_of_path(pathname);
     if (! inumber)
-	return RETURN_FAILURE; 
+        return RETURN_FAILURE;
 
-    /* and open teh file */ 
+    /* and open teh file */
     status = open_ifile(fd, inumber);
 
     return status;
@@ -125,4 +125,3 @@ write_file(file_desc_t *fd, const void *buf, unsigned int nbyte)
 {
     return write_ifile(fd, buf, nbyte);
 }
-

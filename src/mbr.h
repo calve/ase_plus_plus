@@ -4,7 +4,7 @@
 
    MBR definition and manipualtion.
    Philippe Marquet, october 2002
-   
+
 */
 
 #ifndef _MBR_H_
@@ -27,7 +27,7 @@ struct vol_descr_s {
 
 struct mbr_descr_s {
     unsigned int mbr_magic; /* MBR_MAGIC */
-    unsigned int mbr_n_vol; 
+    unsigned int mbr_n_vol;
     struct vol_descr_s mbr_vol[MAX_VOL]; /* first mbr_n_vol are in used */
 };
 
