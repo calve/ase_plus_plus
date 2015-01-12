@@ -1,52 +1,52 @@
-#ifndef __INODE_H__
-#define __INODE_H__
+/* ------------------------------
+   $Id: inode.h 7085 2013-10-18 15:37:14Z marquet $
+   ------------------------------------------------------------
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <assert.h>
-#include <string.h>
+   Inode manipulation.
+   Philippe Marquet, october 2002
 
-#include "drive.h"
-#include "block.h"
-#include "volume.h"
+*/
 
-#define NB_INDIRECT 1
-#define BLOC_SIZE 255
-#define IFILE_FEOF -1
-#define BUFFER_SIZE 1024
+#ifndef _INODE_H_
+#define _INODE_H_
 
+#include "vol.h"        /* for BLOC_SIZE */
 
-enum type_e {
-  DIR,
-  FILES
-};
+enum file_type_e {ordinary, directory, special};
 
 struct inode_s {
-  enum type_e type;
-  int size;
-  int direct[NB_DIRECT];
-  int indirect;   /*  If file is */
-  int indirect2;  /* toobig      */
+    enum file_type_e ind_type;
+    unsigned int ind_size; /* in char */
+/* Basic inode; a sole inode per BLOC */
+#ifndef TEST_D_INDIRECT
+#   define N_DIRECT_BLOCS ((BLOC_SIZE/sizeof(int))-4)
+#else
+#   define N_DIRECT_BLOCS 2
+    unsigned int dummy[((BLOC_SIZE/sizeof(int))-6)];
+#endif
+    unsigned int ind_direct[N_DIRECT_BLOCS];
+    unsigned int ind_indirect;
+    unsigned int ind_d_indirect;
 };
 
-struct file_desc_t {
-  unsigned int inumber;
-  unsigned int size;
-  unsigned int position;
-  unsigned int dirty;
-  unsigned char buffer[BLOC_SIZE];
-};
+/* a bloc full of zeros */
+#define BLOC_NULL 0
 
-int open_ifile(struct file_desc_t* file_descriptor, unsigned int number);
-int read_ifile(struct file_desc_t *file_descriptor);
-int write_ifile(struct file_desc_t *file_descriptor, char c);
-unsigned int create_inode(enum type_e type);
-unsigned int f_bloc_of_position(int position);
-unsigned int v_bloc_of_f_bloc(int inumber, int f_bloc);
-void close_ifile(struct file_desc_t* file_descriptor);
-void delete_inode(unsigned int inumber);
-void flush_ifile(struct file_desc_t* file_descriptor);
-void read_inode(unsigned int inumber);
-void seek2_ifile(struct file_desc_t *file_descriptor, int e_offset);
+/* number of bloc number in a bloc */
+#define NBLOC_PER_BLOC ((BLOC_SIZE/sizeof(int)))
+
+void read_inode (unsigned int inumber, struct inode_s *inode);
+void write_inode (unsigned int inumber, struct inode_s *inode);
+
+/* return the bloc index on the volume of a given bloc index in a
+   file.
+   Return BLOC_NULL for a bloc full of zeros */
+unsigned int vbloc_of_fbloc(unsigned int inumber, unsigned int fbloc);
+
+/* allocate and return a bloc on the volume (in order to write in the
+   file).
+   This may imply indirect and d_indirect bloc creation.
+   Return BLOC_NULL if no allocation was possible. */
+unsigned int allocate_vbloc_of_fbloc(unsigned int inumber, unsigned int bloc);
 
 #endif
