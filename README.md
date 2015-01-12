@@ -1,3 +1,7 @@
+# Todo
+
+Un shell qui permet de se déplacer dans le système de fichier, avec ``ls``, ``cat``, ``cd``
+
 # Missing functions
 
 ## mbr
