@@ -7,7 +7,7 @@
 #include <getopt.h>
 
 #include "block.h"
-#include "volume.h"
+#include "vol.h"
 
 
 static void

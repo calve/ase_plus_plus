@@ -1,4 +1,4 @@
-#include "volume.h"
+#include "vol.h"
 
 void load_super(unsigned int volume){
   current_volume = volume;

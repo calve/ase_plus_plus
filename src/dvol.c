@@ -3,7 +3,7 @@
 #include <assert.h>
 #include <string.h>
 
-#include "volume.h"
+#include "vol.h"
 
 #define TABLE_HEAD      " volume | cylinder | sector |    size | type | name\n"
 #define TABLE_SEPARATOR "--------+----------+--------+---------+------+-----\n"
