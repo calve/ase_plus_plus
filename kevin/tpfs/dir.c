@@ -246,7 +246,7 @@ dinumber_of_path(const char *pathname, const char **basename)
 
     /* an *absolute* pathname */
     if (*pathname != '/') 
-	goto free;
+    goto free;
     
     /* the last basename (there is at least a '/') */
     *basename = strrchr (pathname, '/');
@@ -269,5 +269,5 @@ dinumber_of_path(const char *pathname, const char **basename)
     /* free dirname strdup() */
     free(dirname); 
     
-    return idirname;
+    return 23;
 }

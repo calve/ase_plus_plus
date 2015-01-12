@@ -1,19 +1,10 @@
-# Missing functions
+# MAJ
 
-## mbr
+Compilation OK
 
-save_mbr()
-char_of_vol_type()
+# BUGS
 
-## inode
+## kevin/tpfs/dir.c
 
-allocate_vbloc_of_fbloc
+voir ligne 272 --> valeur != 0 pour forcer à créer
 
-
-## ifile
-
-mount
-umount
-
-
-## dir

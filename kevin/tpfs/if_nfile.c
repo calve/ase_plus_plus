@@ -20,8 +20,10 @@ nfile()
     unsigned int inumber;
     int status;
     int c;
-    
-    inumber = create_ifile(FILE_FILE);
+    char nom[16];
+    printf("%s\n", "Saisissez un nom de fichier :");
+    scanf("%s", nom);
+    inumber = create_file(nom, FILE_FILE);
     ffatal(inumber, "erreur creation fichier");
     printf("%u\n", inumber);
 

@@ -12,6 +12,8 @@
 
 #define ENTRYMAXLENGTH 	16
 
+extern struct superbloc_s super;
+
 /* return the inumber of an absolute pathname. 
    0 if not a valid pathname */
 unsigned int inumber_of_path(const char *pathname);
