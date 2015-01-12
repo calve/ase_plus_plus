@@ -2,10 +2,10 @@
    $Id: ifile.h 7085 2013-10-18 15:37:14Z marquet $
    ------------------------------------------------------------
 
-   File manipulation. 
-   Basic version; manipulate files via their inode number. 
+   File manipulation.
+   Basic version; manipulate files via their inode number.
    Philippe Marquet, october 2002
-   
+
 */
 
 #ifndef _IFILE_H_
@@ -42,7 +42,7 @@ int delete_ifile(unsigned int inumber);
 int open_ifile(file_desc_t *fd, unsigned int inumber);
 
 /*------------------------------
-  Functions copied from sfile. 
+  Functions copied from sfile.
   ------------------------------------------------------------*/
 
 #include "sfile.h"
