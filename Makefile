@@ -35,10 +35,10 @@ lib/drive.o: $(SRCDIR)/drive.c
 lib/block.o: $(SRCDIR)/block.c $(SRCDIR)/drive.c
 	$(CC) $(CFLAGS) -o $@ -c $(SRCDIR)/block.c $(INCDIR)
 
-lib/volume.o: $(SRCDIR)/volume.c $(SRCDIR)/block.c $(SRCDIR)/drive.c
-	$(CC) $(CFLAGS) -o $@ -c $(SRCDIR)/volume.c $(INCDIR)
+lib/vol.o: $(SRCDIR)/vol.c $(SRCDIR)/block.c $(SRCDIR)/drive.c
+	$(CC) $(CFLAGS) -o $@ -c $(SRCDIR)/vol.c $(INCDIR)
 
-lib/inode.o: $(SRCDIR)/inode.c $(SRCDIR)/volume.c $(SRCDIR)/block.c $(SRCDIR)/drive.c
+lib/inode.o: $(SRCDIR)/inode.c $(SRCDIR)/vol.c $(SRCDIR)/block.c $(SRCDIR)/drive.c
 	$(CC) $(CFLAGS) -o $@ -c $(SRCDIR)/inode.c $(INCDIR)
 
 mkhd.o: $(SRCDIR)/mkhd.c
@@ -68,40 +68,14 @@ dump: bindir $(SRCDIR)/dump.o lib/drive.o
 mkvol.o: $(SRCDIR)/mkvol.c
 	$(CC) $(CFLAGS) -o $(LIBDIR)/$@ -c $(SRCDIR)/mkvol.c $(INCDIR) $(LIBS)
 
-mkvol: bindir $(SRCDIR)/mkvol.o lib/volume.o lib/block.o lib/drive.o
-	$(CC) $(CFLAGS) -o $(BINDIR)/mkvol $(SRCDIR)/mkvol.o lib/volume.o lib/block.o lib/drive.o $(LIBS)
+mkvol: bindir $(SRCDIR)/mkvol.o lib/vol.o lib/block.o lib/drive.o
+	$(CC) $(CFLAGS) -o $(BINDIR)/mkvol $(SRCDIR)/mkvol.o lib/vol.o lib/block.o lib/drive.o $(LIBS)
 
 dvol.o: $(SRCDIR)/dvol.c
 	$(CC) $(CFLAGS) -o $(LIBDIR)/$@ -c $(SRCDIR)/dvol.c $(INCDIR) $(LIBS)
 
-dvol: bindir $(SRCDIR)/dvol.o lib/volume.o lib/block.o lib/drive.o
-	$(CC) $(CFLAGS) -o $(BINDIR)/dvol $(SRCDIR)/dvol.o lib/volume.o lib/block.o lib/drive.o $(LIBS)
-
-if_create.o: $(SRCDIR)/if_create.c
-	$(CC) $(CFLAGS) -o $(LIBDIR)/$@ -c $(SRCDIR)/if_create.c $(INCDIR) $(LIBS)
-
-if_create: bindir $(SRCDIR)/if_create.o lib/inode.o lib/volume.o lib/block.o lib/drive.o
-	$(CC) $(CFLAGS) -o $(BINDIR)/if_create $(SRCDIR)/if_create.o lib/inode.o lib/volume.o lib/block.o lib/drive.o $(LIBS)
-
-if_delete.o: $(SRCDIR)/if_delete.c
-	$(CC) $(CFLAGS) -o $(LIBDIR)/$@ -c $(SRCDIR)/if_delete.c $(INCDIR) $(LIBS)
-
-if_delete: bindir $(SRCDIR)/if_delete.o lib/inode.o lib/volume.o lib/block.o lib/drive.o
-	$(CC) $(CFLAGS) -o $(BINDIR)/if_delete $(SRCDIR)/if_delete.o lib/inode.o lib/volume.o lib/block.o lib/drive.o $(LIBS)
-
-
-if_copy.o: $(SRCDIR)/if_copy.c
-	$(CC) $(CFLAGS) -o $(LIBDIR)/$@ -c $(SRCDIR)/if_copy.c $(INCDIR) $(LIBS)
-
-if_copy: bindir $(SRCDIR)/if_copy.o lib/inode.o lib/volume.o lib/block.o lib/drive.o
-	$(CC) $(CFLAGS) -o $(BINDIR)/if_copy $(SRCDIR)/if_copy.o lib/inode.o lib/volume.o lib/block.o lib/drive.o $(LIBS)
-
-if_dump.o: $(SRCDIR)/if_dump.c
-	$(CC) $(CFLAGS) -o $(LIBDIR)/$@ -c $(SRCDIR)/if_dump.c $(INCDIR) $(LIBS)
-
-if_dump: bindir $(SRCDIR)/if_dump.o lib/inode.o lib/volume.o lib/block.o lib/drive.o
-	$(CC) $(CFLAGS) -o $(BINDIR)/if_dump $(SRCDIR)/if_dump.o lib/inode.o lib/volume.o lib/block.o lib/drive.o $(LIBS)
-
+dvol: bindir $(SRCDIR)/dvol.o lib/vol.o lib/block.o lib/drive.o
+	$(CC) $(CFLAGS) -o $(BINDIR)/dvol $(SRCDIR)/dvol.o lib/vol.o lib/block.o lib/drive.o $(LIBS)
 
 bindir:
 	mkdir -p $(BINDIR)
