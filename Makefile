@@ -42,6 +42,15 @@ lib/vol.o: $(SRCDIR)/vol.c $(SRCDIR)/block.c $(SRCDIR)/drive.c
 lib/inode.o: $(SRCDIR)/inode.c $(SRCDIR)/vol.c $(SRCDIR)/block.c $(SRCDIR)/drive.c
 	$(CC) $(CFLAGS) -o $@ -c $(SRCDIR)/inode.c $(INCDIR)
 
+lib/super.o: $(SRCDIR)/super.c
+	$(CC) $(CFLAGS) -o $@ -c $(SRCDIR)/super.c $(INCDIR)
+
+lib/tools.o: $(SRCDIR)/tools.c
+	$(CC) $(CFLAGS) -o $@ -c $(SRCDIR)/tools.c $(INCDIR)
+
+lib/ifile.o: $(SRCDIR)/ifile.c $(SRCDIR)/inode.c
+	$(CC) $(CFLAGS) -o $@ -c $(SRCDIR)/ifile.c $(INCDIR)
+
 mkhd.o: $(SRCDIR)/mkhd.c
 	$(CC) $(CFLAGS) -o $(LIBDIR)/$@ -c $(SRCDIR)/mkhd.c $(INCDIR)
 
