@@ -9,13 +9,13 @@ CORNETTE Damien
 				
 Conseils d'utilisation : 
 	make
-	./mkvol
-	./mknfs
+	./bin/mkvol
+	./bin/mknfs
 	CURRENT_VOLUME=0
 	export CURRENT_VOLUME
-	./if_nfile
-	./if_cfile
-	./if_pfile
+	./bin/if_nfile
+	./bin/if_cfile
+	./bin/if_pfile
 	
 
 Nous avons également réussi à utiliser les variables d'environnement $HW_CONFIG et $CURRENT_VOLUME. En revanche lors de l'utilisation de l'exportation des variables d'environnements, nous pouvons maintenant utiliser les scripts de test if_*file.

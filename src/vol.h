@@ -12,6 +12,7 @@
 #define NB_DIRECT (((SECTOR_SIZE-8)/4))
 #define CANARY (0xFA115AFE)
 #define BLOC_NULL 0
+#define BLOC_SIZE 255 /* This value may not be accurate */
 
 struct super_b {
   int canary;

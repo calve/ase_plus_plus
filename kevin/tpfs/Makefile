@@ -7,12 +7,13 @@ CC	= gcc
 CFLAGS	= -Wall -ansi -pedantic
 CFLAGS  += -std=iso9899:1999
 CFLAGS  += -g -m32
+BINDIR = $(ROOTDIR)/bin
 LIBDIR  = -L$(ROOTDIR)/lib
 INCDIR  = -I$(ROOTDIR)/include
 LIBS    = -lhardware
 
 ###------------------------------
-### Main targets 
+### Main targets
 ###------------------------------------------------------------
 BINARIES= mkhd dmps frmt vm mkvol dvol mknfs dfs if_pfile if_nfile if_cfile if_dfile
 OBJECTS	= $(addsuffix .o,\
@@ -24,29 +25,29 @@ all: $(BINARIES) $(OBJECTS)
 ### Binaries
 ###------------------------------------------------------------
 mkhd: mkhd.o
-	$(CC) $(CFLAGS) -o $@ $^ $(LIBDIR) $(LIBS)
+	$(CC) $(CFLAGS) -o $(BINDIR)/$@ $^ $(LIBDIR) $(LIBS)
 dmps: dmps.o drive.o
-	$(CC) $(CFLAGS) -o $@ $^ $(LIBDIR) $(LIBS)
+	$(CC) $(CFLAGS) -o $(BINDIR)/$@ $^ $(LIBDIR) $(LIBS)
 frmt: frmt.o drive.o
-	$(CC) $(CFLAGS) -o $@ $^ $(LIBDIR) $(LIBS)
+	$(CC) $(CFLAGS) -o $(BINDIR)/$@ $^ $(LIBDIR) $(LIBS)
 vm: vm.o mbr.o drive.o
-	$(CC) $(CFLAGS) -o $@ $^ $(LIBDIR) $(LIBS)
+	$(CC) $(CFLAGS) -o $(BINDIR)/$@ $^ $(LIBDIR) $(LIBS)
 mkvol: mkvol.o mbr.o drive.o
-	$(CC) $(CFLAGS) -o $@ $^ $(LIBDIR) $(LIBS)
+	$(CC) $(CFLAGS) -o $(BINDIR)/$@ $^ $(LIBDIR) $(LIBS)
 dvol: dvol.o mbr.o drive.o
-	$(CC) $(CFLAGS) -o $@ $^ $(LIBDIR) $(LIBS)
+	$(CC) $(CFLAGS) -o $(BINDIR)/$@ $^ $(LIBDIR) $(LIBS)
 mknfs: mknfs.o mbr.o drive.o superbloc.o
-	$(CC) $(CFLAGS) -o $@ $^ $(LIBDIR) $(LIBS)
+	$(CC) $(CFLAGS) -o $(BINDIR)/$@ $^ $(LIBDIR) $(LIBS)
 dfs: dfs.o mbr.o drive.o superbloc.o current.o
-	$(CC) $(CFLAGS) -o $@ $^ $(LIBDIR) $(LIBS)
+	$(CC) $(CFLAGS) -o $(BINDIR)/$@ $^ $(LIBDIR) $(LIBS)
 if_cfile: if_cfile.o $(OBJECTS)
-	$(CC) $(CFLAGS) -o $@ $^ $(LIBDIR) $(LIBS)
+	$(CC) $(CFLAGS) -o $(BINDIR)/$@ $^ $(LIBDIR) $(LIBS)
 if_nfile: if_nfile.o $(OBJECTS)
-	$(CC) $(CFLAGS) -o $@ $^ $(LIBDIR) $(LIBS)
+	$(CC) $(CFLAGS) -o $(BINDIR)/$@ $^ $(LIBDIR) $(LIBS)
 if_dfile: if_dfile.o $(OBJECTS)
-	$(CC) $(CFLAGS) -o $@ $^ $(LIBDIR) $(LIBS)
+	$(CC) $(CFLAGS) -o $(BINDIR)/$@ $^ $(LIBDIR) $(LIBS)
 if_pfile: if_pfile.o ifile.o $(OBJECTS)
-	$(CC) $(CFLAGS) -o $@ $^ $(LIBDIR) $(LIBS)
+	$(CC) $(CFLAGS) -o $(BINDIR)/$@ $^ $(LIBDIR) $(LIBS)
 
 ###------------------------------
 ### #include dependences 

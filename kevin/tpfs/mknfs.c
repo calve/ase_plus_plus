@@ -3,7 +3,25 @@
 #include <string.h>
 #include "superbloc.h"
 
-int main() 
+int volume_loop()
+{
+  int vol;
+  printf("Saisir le numero du volume:\n");
+  while (1)
+    {
+      if (fscanf (stdin, "%i", &vol)!=1){ /* Parse one integer only */
+        fprintf(stderr, "error - volume must be an integer\n");
+        exit(2);
+      }
+      if (vol > MAXVOL || mbr.mbr_vol[vol].vol_nsectors == 0){
+        printf("Veuillez saisir un  numero de volume valide:\n");
+      }
+      else break;
+    }
+  return vol;
+}
+
+int main()
 {
 	int vol;
 	int serie;
@@ -15,13 +33,7 @@ int main()
 	list_volumes();
     write_mbr();
 
-    printf("Saisir le numero du volume:\n");
-    scanf("%i", &vol);
-    while (mbr.mbr_vol[vol].vol_nsectors == 0)
-    {
-    	printf("Veuillez saisir un  numero de volume valide:\n");
-    	scanf("%i", &vol);
-    }
+    vol = volume_loop();
     printf("Saisir le numero de série:\n");
     scanf("%i", &serie);
 	init_super(vol, serie, test);
