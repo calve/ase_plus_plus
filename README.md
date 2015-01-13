@@ -1,23 +1,15 @@
+# MAJ
+
+Compilation OK
+
 # Todo
 
 Un shell qui permet de se déplacer dans le système de fichier, avec ``ls``, ``cat``, ``cd``
 
-# Missing functions
 
-## mbr
+# BUGS
 
-save_mbr()
-char_of_vol_type()
+## kevin/tpfs/dir.c
 
-## inode
+voir ligne 272 --> valeur != 0 pour forcer à créer
 
-allocate_vbloc_of_fbloc
-
-
-## ifile
-
-mount
-umount
-
-
-## dir
