@@ -13,5 +13,5 @@ bin-dir:
 
 realclean:
 	rm -rf ./bin
-	cd $(SRCDIR); rm -f *.o
+	cd $(SRCDIR); make realclean
 	cd ..
