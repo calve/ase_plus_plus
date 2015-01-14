@@ -10,30 +10,30 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
-#include "ifile.h"
+#include "file.h"
 #include "mount.h"
 
 static void
-pfile(unsigned int inumber)
+pfile(const char *pathname)
 {
     file_desc_t fd;
     int status;
     int c;
     
-    status = open_ifile(&fd, inumber);
-    ffatal(!status, "erreur ouverture fichier %d", inumber);
+    status = open_file(&fd, pathname);
+    ffatal(!status, "erreur ouverture fichier %s", pathname);
 
-    while((c=readc_ifile(&fd)) != READ_EOF)
+    while((c=readc_file(&fd)) != READ_EOF)
         putchar(c);
 
-    close_ifile(&fd);
+    close_file(&fd);
 }
 
 static void
 usage(const char *prgm)
 {
     fprintf(stderr, "[%s] usage:\n\t"
-            "%s inumber\n", prgm, prgm);
+            "%s name\n", prgm, prgm);
     exit(EXIT_FAILURE);
 }
 
@@ -41,17 +41,12 @@ int
 main (int argc, char *argv[])
 {
     unsigned inumber;
-    
-    if (argc != 2)
+    if (argc < 2)
         usage(argv[0]);
-
-    errno = 0;
-    inumber = strtol(argv[1], NULL, 10);
-    if (errno || inumber <= 0)
-        usage(argv[0]);
+    printf("%s\n", argv[1]);
 
     mount();
-    pfile(inumber);
+    pfile(argv[1]);
     umount();
     
     exit(EXIT_SUCCESS);         
