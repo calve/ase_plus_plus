@@ -5,8 +5,13 @@ BINARIES= mkhd dmps frmt vm mkvol dvol mknfs dfs if_pfile if_nfile if_cfile if_d
 
 all: bin-dir
 	make -C $(SRCDIR)
-	cd $
-	mv $(SRCDIR)/ $(BINDIR)
+	cp hardware.ini ./$(BINDIR)
+	cd $(BINDIR); ./mkhd
 
 bin-dir:
 	mkdir -p $(BINDIR)
+
+realclean:
+	rm -rf ./bin
+	cd $(SRCDIR); rm -f *.o
+	cd ..
