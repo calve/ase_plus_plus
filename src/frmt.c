@@ -36,13 +36,13 @@ main(int argc, char **argv)
         sectorsize=_in(HDA_DATAREGS+4)<<8;
     	sectorsize+=_in(HDA_DATAREGS+5);
     	buff=malloc(sectorsize);
-        for (j=0; j < nbsector; j++)
+        for (j=sector; j < nbsector; j++)
         {
-    	    read_sector(cylinder,sector,buff);
-            format_sector(cylinder,sector++,1,0);
+            read_sector(cylinder,j,buff);
+            format_sector(cylinder,j,1,0);
             dump(buff,sectorsize,0,1);
         }
-        printf("\nLes données de %d secteurs du cylindre %d ont été formatées\n", nbsector, cylinder);
+        printf("\nLes données de %d secteurs du cylindre %d ont été formatées\n", nbsector - sector , cylinder);
     }
     else 
     {
