@@ -18,6 +18,10 @@ Compilation OK
 
 Il faut s'assurer de diposer de ``hardware.ini`` dans le dossier courant. Puis lancer le binaire
 
+# Test
+
+``make test`` lance une suite de test qui crée un disque virtuel, crée des partitions, des fichiers …
+
 # Todo
 
 Intégrer if_nfile, if_pfile et if_cfile dans un premier temps
