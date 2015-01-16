@@ -11,6 +11,8 @@
 #define _DIR_H_
 
 #define ENTRYMAXLENGTH 	16
+#define ROOT_INODE 1            /* Reserve inode 1 for / (the root of the filesystem) */
+#define MAX_DIR_SIZE 256        /* Number of entry in an entry (or files in dir) */
 
 extern struct superbloc_s super;
 
@@ -41,7 +43,8 @@ int del_entry(unsigned int idir, const char *basename);
    dir. Use at your own risk.*/
 struct entry_s {
     unsigned int ent_inumber;
-    char ent_basename[ENTRYMAXLENGTH]; 
+    char ent_basename[ENTRYMAXLENGTH];
+    struct entry_s *childrens[MAX_DIR_SIZE]; /* An array of pointer to others entries */
 }; 
 
 #endif

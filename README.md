@@ -24,7 +24,9 @@ Il faut s'assurer de diposer de ``hardware.ini`` dans le dossier courant. Puis l
 
 # Todo
 
-Intégrer if_nfile, if_pfile et if_cfile dans un premier temps
+Intégrer if_nfile, if_pfile et if_cfile dans un premier temps.
+
+On peut ajouter un ``pathname`` ainsi qu'un tableau d'enfants à la structure ``entry_s``.
 
 Un shell qui permet de se déplacer dans le système de fichier, avec ``ls``, ``cat``, ``cd``
 

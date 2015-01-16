@@ -95,7 +95,7 @@ add_entry(unsigned int idir, unsigned int inumber, const char *basename)
     /* built the entry */
     entry.ent_inumber = inumber;
     strncpy(entry.ent_basename, basename, ENTRYMAXLENGTH);
-    entry.ent_basename[ENTRYMAXLENGTH] = 0;
+    entry.ent_basename[ENTRYMAXLENGTH] = 0; /* Bufferoverflow suspected */
 
     /* seek to the right position */
     seek2_ifile(fd, ientry * sizeof(struct entry_s));
@@ -201,10 +201,10 @@ inumber_of_path(const char *pathname)
     
     /* an *absolute* pathname */
     if (*pathname != '/')
-	return 1;
+	return ROOT_INODE;
 
     /* start at root */
-    icurrent = super.numero;
+    icurrent = ROOT_INODE;
     
     while (*pathname) {
 	if (*pathname != '/') {
