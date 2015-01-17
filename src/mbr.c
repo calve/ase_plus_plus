@@ -40,17 +40,17 @@ void write_mbr ()
 /* Retourne le numero de secteur du bloc */
 int nsec_of_nbloc(unsigned int nvol, unsigned int nbloc)
 {
-	int premierSec;
-	premierSec = mbr.mbr_vol[nvol].vol_sector;
-	return (premierSec + nbloc) % HDA_MAXSECTOR;
+        assert(mbr.magic_number == MBR_MAGIC);
+        assert(nvol < MAXVOL);
+        return (mbr.mbr_vol[nvol].vol_sector + nbloc) % MAX_SECTOR;
 }
 
 /* Retourne le numéro du cylindre du bloc */
 int ncyl_of_nbloc(unsigned int nvol, unsigned int nbloc)
 {
-	int premierCyl = mbr.mbr_vol[nvol].vol_cylinder;
-	int premierSec = nsec_of_nbloc(nvol, nbloc);
-	return premierCyl + (premierSec + nbloc) / HDA_MAXSECTOR;
+        assert(mbr.magic_number == MBR_MAGIC);
+        assert(nvol < MAXVOL);
+        return mbr.mbr_vol[nvol].vol_cylinder + ((mbr.mbr_vol[nvol].vol_sector + nbloc) / MAX_SECTOR);
 }
 
 void read_bloc(unsigned int vol, unsigned int nbloc, unsigned char *buffer)
@@ -83,12 +83,18 @@ void write_nbloc(unsigned int vol, unsigned int nbloc, const unsigned char *buff
 	write_nsector(cylinder, sector, buffer, size);
 }
 
+/* Format all sectors of one volume
+ */
 void format_vol(unsigned int vol)
 {
-	int cylinder = mbr.mbr_vol[vol].vol_cylinder;
-	int sector = mbr.mbr_vol[vol].vol_sector;
 	int nsector = mbr.mbr_vol[vol].vol_nsectors;
-	format_sector(cylinder, sector, nsector, 0);
+        unsigned int i;
+        for (i = 0; i < mbr.mbr_vol[vol].vol_nsectors; i++)
+          {
+            int cylinder = ncyl_of_nbloc(vol, i);
+            int sector = nsec_of_nbloc(vol, i);
+            format_sector(cylinder, sector, nsector, 0);
+          }
 }
 
 char* display_type_vol(enum type_vol_e type)

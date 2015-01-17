@@ -4,6 +4,8 @@
 #include "drive.h"
 
 #define MBR_MAGIC 0xD0CABEEF
+#define MAX_SECTOR 16
+
 
 /* ATTENTION */
 /* A voir s'il ne faut pas modifier HDA_SECTORSIZE = 512 */
