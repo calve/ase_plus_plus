@@ -110,7 +110,7 @@ void free_bloc(unsigned int bloc)
 
 float taux_occupation(unsigned int vol)
 {
-	return (1.00 - (float)super.nb_bloc_libre/(float)(mbr.mbr_vol[vol].vol_nsectors-1))*100.00;
+	return (1.00 - ((float)mbr.mbr_vol[vol].vol_nsectors-1 - (float)super.nb_bloc_libre)/(float)(mbr.mbr_vol[vol].vol_nsectors-1))*100.00;
 }
 
 void display()
