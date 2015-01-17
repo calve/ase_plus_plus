@@ -33,7 +33,7 @@ test: $(BINDIR)/dvol $(BINDIR)/mkvol
 	@echo ""
 	@echo "Create a filesystem on current_volume"
 	@echo ""
-	$(BINDIR)/mknfs < echo $(CURRENT_VOLUME)\n42\n10
+	$(BINDIR)/mknfs --volume $(CURRENT_VOLUME) --serial 424242 --size 14
 	@echo ""
 	@echo "We will now create several inodes"
 	@echo ""
