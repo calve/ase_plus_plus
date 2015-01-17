@@ -35,9 +35,6 @@ struct inode_s{
 };
 
 
-/* a bloc full of zeros */
-#define BLOC_NULL 0
-
 /* inodes i/o */
 void read_inode (unsigned int inumber, struct inode_s *inode);
 void write_inode (unsigned int inumber, struct inode_s *inode);

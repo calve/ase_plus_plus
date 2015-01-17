@@ -4,24 +4,27 @@
 #include "mbr.h"
 
 #define SUPER_MAGIC 0xACCD1001
+#define BLOC_MAGIC 0xAC1DAC1D
 #define SUPER 0
+/* a bloc full of zeros */
+#define BLOC_NULL 0
 
 extern unsigned int current_vol;
 
 struct free_bloc_s 
 {
-	unsigned size;
-	unsigned next_free;
+	unsigned int magic;
+	int next_free;
 };
 
 struct superbloc_s
 {
-	int magic;
+	unsigned int magic;
 	int numero;
 	char nom[32];
 	int id;
-	unsigned premier_libre;
-	unsigned nb_bloc_libre;
+	unsigned int premier_libre;
+	unsigned int nb_bloc_libre;
 };
 
 void init_super(unsigned int vol, unsigned int num_serie, char nom[32]);
