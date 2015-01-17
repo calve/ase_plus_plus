@@ -60,11 +60,27 @@ void read_bloc(unsigned int vol, unsigned int nbloc, unsigned char *buffer)
 	read_sector(cylinder, sector, buffer);
 }
 
+
+void read_nbloc(unsigned int vol, unsigned int nbloc, unsigned char *buffer, int size)
+{
+	int cylinder = ncyl_of_nbloc(vol, nbloc);
+	int sector = nsec_of_nbloc(vol, nbloc);
+	read_nsector(cylinder, sector, buffer, size);
+}
+
+
 void write_bloc(unsigned int vol, unsigned int nbloc, const unsigned char *buffer)
 {
 	int cylinder = ncyl_of_nbloc(vol, nbloc);
 	int sector = nsec_of_nbloc(vol, nbloc);
 	write_sector(cylinder, sector, buffer);
+}
+
+void write_nbloc(unsigned int vol, unsigned int nbloc, const unsigned char *buffer, int size)
+{
+	int cylinder = ncyl_of_nbloc(vol, nbloc);
+	int sector = nsec_of_nbloc(vol, nbloc);
+	write_nsector(cylinder, sector, buffer, size);
 }
 
 void format_vol(unsigned int vol)
