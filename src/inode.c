@@ -18,7 +18,6 @@ unsigned int create_inode(enum file_type_e type)
 {
 	struct inode_s inode;
 	int i;
-	/*memset(&inode, 0, sizeof(struct inode_s)); */	
 	inode.type = type;
 	inode.size = 0;
 	inode.blocs_double_indirect = 0;
@@ -27,6 +26,9 @@ unsigned int create_inode(enum file_type_e type)
 		inode.blocs_directs[i] = 0;
 	}
 	unsigned int inumber = new_bloc();
+        if (!inumber){
+          return BLOC_NULL;
+        }
 	write_inode(inumber, &inode);
 	return inumber;
 }

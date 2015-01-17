@@ -107,20 +107,6 @@ int main(int argc, char** argv)
     printf("Formated\n");
     init_super(vol, serial, test);
 
-    for (i=0; i<nbblocs; i++)
-      {
-        if (new_bloc() == 0)
-          {
-            break;
-          }
-      }
-
-    save_super();
-    if ((unsigned int) nbblocs > mbr.mbr_vol[vol].vol_nsectors-1)
-        {
-            nbblocs = mbr.mbr_vol[vol].vol_nsectors-1;
-        }
-    printf("Superbloc rempli de %d blocs !\n", nbblocs);
     printf("Taux d'occupation : %f/100\n", taux_occupation(vol));
 
     exit(EXIT_SUCCESS);

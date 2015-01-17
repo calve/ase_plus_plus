@@ -14,7 +14,7 @@ extern unsigned int current_vol;
 struct free_bloc_s 
 {
 	unsigned int magic;
-	int next_free;
+	unsigned int next_free;
 };
 
 struct superbloc_s

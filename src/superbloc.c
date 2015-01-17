@@ -22,7 +22,7 @@ void init_super(unsigned int vol, unsigned int num_serie, char nom[32])
 	current_volume = vol;
 
         /* initialisation de la liste des blocs */
-          for (i = 1; i < (mbr.mbr_vol[current_volume].vol_nsectors); i++){
+        for (i = 1; i < (mbr.mbr_vol[current_volume].vol_nsectors); i++){
             struct free_bloc_s block;
             struct free_bloc_s in_bloc;
             block.magic = BLOC_MAGIC;
@@ -33,8 +33,7 @@ void init_super(unsigned int vol, unsigned int num_serie, char nom[32])
             /* Check bloc */
             read_nbloc(current_volume, i, (unsigned char*)&in_bloc, sizeof(in_bloc));
             assert(in_bloc.magic == BLOC_MAGIC);
-          }
-        printf("Initiated super_bloc with %i blocs\n", super.nb_bloc_libre);
+        }
         save_super();
         assert(super.magic == SUPER_MAGIC);
 }
@@ -61,9 +60,10 @@ void save_super()
     write_nbloc(current_volume, 0, (unsigned char*) &super, sizeof(super));
 }
 
+/* Returns an unallocated bloc from the superbloc bloc list
+ */
 unsigned int new_bloc()
 {
-    unsigned char buffer[HDA_SECTORSIZE];
     struct free_bloc_s free_bloc;
     int premier_libre;
     if (super.premier_libre == BLOC_NULL){
@@ -71,9 +71,7 @@ unsigned int new_bloc()
         return 0;
     }
     premier_libre = super.premier_libre;
-    memset(buffer, 0, HDA_SECTORSIZE);
-    read_bloc(current_volume, premier_libre, buffer);
-    free_bloc = *(struct free_bloc_s*) &buffer;
+    read_nbloc(current_volume, premier_libre, (unsigned char*)&free_bloc, sizeof(free_bloc));
     assert(free_bloc.magic == BLOC_MAGIC);
     if (free_bloc.next_free != BLOC_NULL) {
         super.premier_libre = free_bloc.next_free;
@@ -90,14 +88,14 @@ void free_bloc(unsigned int bloc)
 {
 	unsigned char buf[HDA_SECTORSIZE];
 	struct free_bloc_s* fb;
-	memset(buf, 0, HDA_SECTORSIZE); 
+	memset(buf, 0, HDA_SECTORSIZE);
 
 	if(bloc==0){
 		printf("free_bloc impossible sur le permier bloc (reserve)\n");
 		return;
 	}
 
-	/* On bloque ici */ 
+	/* On bloque ici */
 	read_bloc(current_volume, bloc, buf);
 	fb = (struct free_bloc_s*) buf;
 	fb->next_free = super.premier_libre;
@@ -110,7 +108,7 @@ void free_bloc(unsigned int bloc)
 
 float taux_occupation(unsigned int vol)
 {
-	return (1.00 - ((float)mbr.mbr_vol[vol].vol_nsectors-1 - (float)super.nb_bloc_libre)/(float)(mbr.mbr_vol[vol].vol_nsectors-1))*100.00;
+	return (1.00 - (float)super.nb_bloc_libre/(float)(mbr.mbr_vol[vol].vol_nsectors-1))*100.00;
 }
 
 void display()
