@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
+#include "inode.h"
 #include "file.h"
 #include "mount.h"
 

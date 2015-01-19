@@ -1,3 +1,8 @@
+#include <stdlib.h>
+#include <stdio.h>
+
+#include "hardware_ini.h"
+#include "../include/hardware.h"
 #include "drive.h"
 
 static void

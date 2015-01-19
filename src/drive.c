@@ -1,9 +1,12 @@
-#include "drive.h"
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
+#include "hardware_ini.h"
+#include "../include/hardware.h"
+#include "drive.h"
 
 void seek_sector(unsigned int cylinder, unsigned int sector)
 {

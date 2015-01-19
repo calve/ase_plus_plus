@@ -12,11 +12,10 @@
 #include <stdio.h>
 #include <memory.h>
 
-#include "inode.h"
 #include "tools.h"
-#include "ifile.h"
-
 #include "mbr.h"
+#include "inode.h"
+#include "ifile.h"
 
 /* the file bloc number of a given character position in a file */  
 #define bloc_of_pos(pos) ((pos) / DATA_BLOC_SIZE)

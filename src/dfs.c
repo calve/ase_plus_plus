@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "hardware_ini.h"
+#include "tools.h"
+#include "mbr.h"
 #include "superbloc.h"
 
 extern char* get_hw_config();

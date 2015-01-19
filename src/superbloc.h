@@ -1,8 +1,6 @@
 #ifndef SB
 #define SB
 
-#include "mbr.h"
-
 #define SUPER_MAGIC 0xACCD1001
 #define BLOC_MAGIC 0xAC1DAC1D
 #define SUPER 0

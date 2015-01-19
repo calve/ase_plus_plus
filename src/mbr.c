@@ -1,9 +1,12 @@
-#include "mbr.h"
 #include <assert.h>
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "hardware_ini.h"
+#include "../include/hardware.h"
+#include "drive.h"
+#include "mbr.h"
 
 struct mbr_s mbr;
 

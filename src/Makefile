@@ -36,9 +36,9 @@ mkvol: mkvol.o mbr.o drive.o
 	$(CC) $(CFLAGS) -o $(BINDIR)/$@ $^ $(LIBDIR) $(LIBS)
 dvol: dvol.o mbr.o drive.o
 	$(CC) $(CFLAGS) -o $(BINDIR)/$@ $^ $(LIBDIR) $(LIBS)
-mknfs: mknfs.o mbr.o drive.o superbloc.o
+mknfs: mknfs.o mbr.o drive.o superbloc.o ifile.o inode.o tools.o
 	$(CC) $(CFLAGS) -o $(BINDIR)/$@ $^ $(LIBDIR) $(LIBS)
-dfs: dfs.o mbr.o drive.o superbloc.o current.o
+dfs: dfs.o mbr.o drive.o superbloc.o ifile.o inode.o tools.o current.o
 	$(CC) $(CFLAGS) -o $(BINDIR)/$@ $^ $(LIBDIR) $(LIBS)
 if_cfile: if_cfile.o $(OBJECTS)
 	$(CC) $(CFLAGS) -o $(BINDIR)/$@ $^ $(LIBDIR) $(LIBS)
@@ -63,9 +63,9 @@ drive.o: drive.c drive.h
 mbr.o: mbr.c drive.h mbr.h
 mkvol.o: mbr.c mbr.h drive.h
 dvol.o: mbr.c mbr.h drive.h
-mknfs.o: mbr.h drive.h superbloc.h mknfs.c
+mknfs.o: mbr.h drive.h superbloc.h ifile.h mknfs.c
 dfs.o: mbr.h drive.h superbloc.h dfs.c current.c
-superbloc.o: mbr.h drive.h superbloc.h superbloc.c
+superbloc.o: mbr.h drive.h ifile.h superbloc.h  superbloc.c
 inode.o:inode.c inode.h mbr.h superbloc.h drive.h
 
 if_cfile.o: if_cfile.c ifile.h inode.h tools.h mount.h dir.h file.h

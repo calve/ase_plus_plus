@@ -11,13 +11,11 @@
 #define _INODE_H_
 
 
+#include "hardware_ini.h"
 #include "tools.h"
-#include "drive.h"
-#include "superbloc.h"
-#include "mbr.h"
-#include <assert.h>
+
 #define NB_DIRECTS (HDA_SECTORSIZE/4)-4
-#define BLOC_SIZE       HDA_SECTORSIZE  
+#define BLOC_SIZE       HDA_SECTORSIZE
 #define DATA_BLOC_SIZE  BLOC_SIZE
 #define NB_BLOCS_BY_BLOC  NB_DIRECTS+4
 #define HW_CONFIG "hardware.ini"

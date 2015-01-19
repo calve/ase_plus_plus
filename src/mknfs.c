@@ -4,6 +4,9 @@
 #include <unistd.h>
 #include <ctype.h>
 #include <getopt.h>
+
+#include "tools.h"
+#include "mbr.h"
 #include "superbloc.h"
 
 void print_help(char* program_name){

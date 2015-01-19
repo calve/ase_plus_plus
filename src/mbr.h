@@ -1,10 +1,10 @@
 #ifndef MBR
 #define MBR
 
-#include "drive.h"
+#include "hardware_ini.h" /* Contains MAXVOL */
 
 #define MBR_MAGIC 0xD0CABEEF
-#define MAX_SECTOR 16
+#define MAX_SECTOR 32
 
 
 /* ATTENTION */

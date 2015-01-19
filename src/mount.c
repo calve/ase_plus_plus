@@ -7,15 +7,15 @@
    
 */
 
-#include <stdlib.h>
-#include <stdio.h>
 #include <assert.h>
 #include <errno.h>
+#include <stdio.h>
+#include <stdlib.h>
+
 #include "hardware_ini.h"
-#include "drive.h"
+#include "../include/hardware.h"
 #include "tools.h"
-
-
+#include "drive.h"
 #include "mbr.h"
 #include "superbloc.h"
 

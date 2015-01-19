@@ -11,7 +11,7 @@
 #ifndef _IFILE_H_
 #define _IFILE_H_
 
-#include "inode.h"
+#include "inode.h" /* Contains DATA_BLOC_SIZE */
 
 /* Despite the user does not need these definitions, our first
    implementation allocates file descriptors in the user space. Thus

@@ -1,3 +1,10 @@
+#include <assert.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "drive.h"
+#include "mbr.h"
+#include "superbloc.h"
 #include "inode.h"
 
 unsigned int current_volume;

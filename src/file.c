@@ -7,6 +7,8 @@
    
 */
 
+#include <stdio.h>
+
 #include "mbr.h"
 #include "superbloc.h"
 #include "ifile.h"

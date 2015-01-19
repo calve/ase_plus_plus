@@ -1,13 +1,6 @@
 #ifndef DRIVE
 #define DRIVE
 
-#include "hardware_ini.h"
-#include "../include/hardware.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-
 #define HW_CONFIG "hardware.ini"
 
 void seek_sector(unsigned int cylinder, unsigned int sector);

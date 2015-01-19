@@ -1,8 +1,12 @@
-#include "superbloc.h"
 #include <assert.h>
-
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "tools.h"
+#include "mbr.h"
+#include "ifile.h"
+#include "superbloc.h"
 
 struct superbloc_s super;
 unsigned current_volume;
