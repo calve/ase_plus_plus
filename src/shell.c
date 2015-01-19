@@ -199,9 +199,10 @@ int main(int argc, char** argv){
     /* Evaluate the command line */
     if (cmdline[0] != '\0') /* evaluate the command line only it is not empty */
       {
-	add_history(cmdline);
-	eval(cmdline);
-	fflush(stdout);
+        add_history(cmdline);
+        eval(cmdline);
+        fflush(stdout);
+        fflush(stdin);
       }
 
     free(cmdline); /* As been allocated by readline */
