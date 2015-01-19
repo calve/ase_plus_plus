@@ -36,7 +36,6 @@ int main(int argc, char** argv)
     int vol = -1;
     int serial = -1;
     int nbblocs = -1;
-    int i;
     int opt = 0;
     int long_index = 0;
     char test[32] = "test";
