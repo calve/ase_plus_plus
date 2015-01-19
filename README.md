@@ -1,7 +1,3 @@
-# MAJ
-
-Compilation OK
-
 # Structure
 
     |
@@ -36,16 +32,15 @@ Il faut s'assurer de diposer de ``hardware.ini`` dans le dossier courant. Puis l
 
 # Todo
 
-Intégrer if_nfile, if_pfile et if_cfile dans un premier temps.
+Un shell qui permet d'interagir avec le système de fichier :
 
-On peut ajouter un ``pathname`` ainsi qu'un tableau d'enfants à la structure ``entry_s``.
+  + ls
+  + cd
+  + mkdir
+  + cat
+  + creation de fichier
 
-Un shell qui permet de se déplacer dans le système de fichier, avec ``ls``, ``cat``, ``cd``
-
+On peut regarder la bibliothèque ``cliparser`` pour gérer le coté shell interactif
 
 # BUGS
-
-## kevin/tpfs/dir.c
-
-voir ligne 272 --> valeur != 0 pour forcer à créer
 
