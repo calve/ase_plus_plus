@@ -47,16 +47,43 @@ char* get_arguments(char* command_line){
   return strchr(command_line, ' ')+1;;
 }
 
-/* Above are listed all builtins commands
- * Keep them ordered !
+/* Maintain a compact list of all builtins commands with their usage
  */
 
 void do_help(){
   printf("List of built-in commands :\n");
+  printf("  cd\n");
   printf("  help\n");
   printf("  ls\n");
   printf("  mount volume\n");
   printf("  mkdir path\n");
+}
+
+/* Above are listed all builtins commands
+ * Keep them ordered !
+ */
+
+void do_cd(char* arguments){
+  int status;
+  char target[MAXPROMPT];
+  if (*arguments != '/'){
+    strcpy(target, cwd);
+  }
+  strcat(target, arguments);
+
+  /* Always append a final '/' */
+  if (target[strlen(target)-1] != '/'){
+    strcat(target, "/");
+  }
+
+  /* Check if directory exists */
+  status = inumber_of_path(target);
+  if (status == 0){
+    printf("Could not find %s\n", target);
+  }
+  else {
+    strcpy(cwd, target);
+  }
 }
 
 /* Print the current working directory only for the moment */
@@ -90,6 +117,10 @@ void do_mount(char* arguments){
  */
 int eval(char *cmd){
   char *arguments = get_arguments(cmd);
+  if(!is_command(cmd, "cd")){
+    do_cd(arguments);
+    return 0;
+  }
   if(!is_command(cmd, "help")){
     do_help();
     return 0;
