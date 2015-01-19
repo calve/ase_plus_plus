@@ -29,12 +29,12 @@ create_file(const char *pathname, enum file_type_e type)
     /* does the directory exist? */
     idir = dinumber_of_path(pathname, &basename); 
     if (! idir)
-  return RETURN_FAILURE;
+      return RETURN_FAILURE;
 
     /* create the file */
     inumber = create_ifile(type);
     if (! inumber)
-  return RETURN_FAILURE;
+      return RETURN_FAILURE;
 
     /*  link the file in his directory */
     status = add_entry(idir, inumber, basename);
