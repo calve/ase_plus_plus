@@ -47,11 +47,19 @@ char* get_arguments(char* command_line){
   return strchr(command_line, ' ')+1;;
 }
 
+void absolute_path(char* target, char* path){
+  if (*path != '/'){
+    strcpy(target, cwd);
+  }
+  strcat(target, path);
+}
+
 /* Maintain a compact list of all builtins commands with their usage
  */
 
 void do_help(){
   printf("List of built-in commands :\n");
+  printf("  cat\n");
   printf("  cd\n");
   printf("  help\n");
   printf("  ls\n");
@@ -63,13 +71,27 @@ void do_help(){
  * Keep them ordered !
  */
 
+void do_cat(char* arguments){
+  file_desc_t fd;
+  int status;
+  int c;
+  char target[MAXPROMPT];
+  absolute_path(target, arguments);
+
+  status = open_file(&fd, target);
+  ffatal(!status, "erreur ouverture fichier %s", target);
+
+  while((c=readc_file(&fd)) != READ_EOF)
+    putchar(c);
+
+  close_file(&fd);
+  printf("\n");
+}
+
 void do_cd(char* arguments){
   int status;
   char target[MAXPROMPT];
-  if (*arguments != '/'){
-    strcpy(target, cwd);
-  }
-  strcat(target, arguments);
+  absolute_path(target, arguments);
 
   /* Always append a final '/' */
   if (target[strlen(target)-1] != '/'){
@@ -90,11 +112,15 @@ void do_cd(char* arguments){
 void do_ls(){
   file_desc_t current;
   struct entry_s entry;
+  int counter = 0;
   open_file(&current, cwd);
   while (read_ifile (&current, &entry, sizeof(struct entry_s)) != READ_EOF){
     printf("%s ",entry.ent_basename);
+    counter++;
   }
-  printf("\n");
+  if (counter > 0) {
+      printf("\n");
+  }
   close_file(&current);
 }
 
@@ -117,6 +143,10 @@ void do_mount(char* arguments){
  */
 int eval(char *cmd){
   char *arguments = get_arguments(cmd);
+  if(!is_command(cmd, "cat")){
+    do_cat(arguments);
+    return 0;
+  }
   if(!is_command(cmd, "cd")){
     do_cd(arguments);
     return 0;
