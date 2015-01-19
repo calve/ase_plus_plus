@@ -3,7 +3,7 @@
    ------------------------------------------------------------
 
    Directories manipulation.
-   Based on the ifile library.    
+   Based on the ifile library.
    Philippe Marquet, october 2002
 
 */
@@ -29,21 +29,21 @@
 static unsigned int
 new_entry(file_desc_t *fd)
 {
-    struct entry_s entry;
-    unsigned int ientry = 0; /* the new entry index */
+  struct entry_s entry;
+  unsigned int ientry = 0; /* the new entry index */
 
-    /* seek to begin of dir */
-    seek2_ifile(fd, 0);
-    
-    /* look after a null inumber in an entry */
-    while (read_ifile (fd, &entry, sizeof(struct entry_s)) != READ_EOF) {
-	if (! entry.ent_inumber)
-	    return ientry;
-	ientry++;
-    }
-    
-    /* need to append an entry in the dir */
-    return ientry;
+  /* seek to begin of dir */
+  seek2_ifile(fd, 0);
+
+  /* look after a null inumber in an entry */
+  while (read_ifile (fd, &entry, sizeof(struct entry_s)) != READ_EOF) {
+    if (! entry.ent_inumber)
+      return ientry;
+    ientry++;
+  }
+
+  /* need to append an entry in the dir */
+  return ientry;
 }
 
 /* return the entry index or RETURN_FAILURE.
@@ -51,22 +51,22 @@ new_entry(file_desc_t *fd)
 static int
 find_entry(file_desc_t *fd, const char *basename)
 {
-    struct entry_s entry;
-    unsigned int ientry = 0; /* the entry index */
+  struct entry_s entry;
+  unsigned int ientry = 0; /* the entry index */
 
-    /* seek to begin of dir */
-    seek2_ifile(fd, 0);
-    
-    /* look after the right entry */
-    while (read_ifile (fd, &entry, sizeof(struct entry_s)) != READ_EOF) {
-	if (entry.ent_inumber
-	    && ! strcmp(entry.ent_basename, basename))
-	    return ientry;
-	ientry++;
-    }
+  /* seek to begin of dir */
+  seek2_ifile(fd, 0);
 
-    /* not found */
-    return RETURN_FAILURE;
+  /* look after the right entry */
+  while (read_ifile (fd, &entry, sizeof(struct entry_s)) != READ_EOF) {
+    if (entry.ent_inumber
+        && ! strcmp(entry.ent_basename, basename))
+      return ientry;
+    ientry++;
+  }
+
+  /* not found */
+  return RETURN_FAILURE;
 }
 
 /*------------------------------
@@ -75,199 +75,207 @@ find_entry(file_desc_t *fd, const char *basename)
 int
 add_entry(unsigned int idir, unsigned int inumber, const char *basename)
 {
-    struct inode_s inode; 
-    file_desc_t _fd, *fd = &_fd;
-    struct entry_s entry; 
-    unsigned int ientry = 0;
-    int nbyte; 
-    
-    /* a directory inode? */
-    read_inode(idir, &inode); 
-    if (inode.type != FILE_DIRECTORY) 
-	return RETURN_FAILURE;
-    
-    /* open the dir */
-    open_ifile(fd, idir);
+  struct inode_s inode;
+  file_desc_t _fd, *fd = &_fd;
+  struct entry_s entry;
+  unsigned int ientry = 0;
+  int nbyte;
 
-    /* the new entry position in the file */
-    ientry = new_entry(fd);
-    
-    /* built the entry */
-    entry.ent_inumber = inumber;
-    strncpy(entry.ent_basename, basename, ENTRYMAXLENGTH);
-    entry.ent_basename[ENTRYMAXLENGTH] = 0; /* Bufferoverflow suspected */
+  /* a directory inode? */
+  read_inode(idir, &inode);
+  if (inode.type != FILE_DIRECTORY)
+    return RETURN_FAILURE;
 
-    /* seek to the right position */
-    seek2_ifile(fd, ientry * sizeof(struct entry_s));
-    
-    /* write the entry */
-    nbyte = write_ifile(fd, &entry, sizeof(struct entry_s));
-    
-    /* done */
-    close_ifile(fd); /* even in case of write failure */
+  /* open the dir */
+  open_ifile(fd, idir);
 
-    if (nbyte == sizeof(struct entry_s))
-	return RETURN_SUCCESS;
-    else
-	return RETURN_FAILURE;
+  /* the new entry position in the file */
+  ientry = new_entry(fd);
+
+  /* built the entry */
+  entry.ent_inumber = inumber;
+  strncpy(entry.ent_basename, basename, ENTRYMAXLENGTH);
+  entry.ent_basename[ENTRYMAXLENGTH] = 0; /* Bufferoverflow suspected */
+
+  /* seek to the right position */
+  seek2_ifile(fd, ientry * sizeof(struct entry_s));
+
+  /* write the entry */
+  nbyte = write_ifile(fd, &entry, sizeof(struct entry_s));
+
+  /* done */
+  close_ifile(fd); /* even in case of write failure */
+
+  if (nbyte == sizeof(struct entry_s))
+    return RETURN_SUCCESS;
+  else
+    return RETURN_FAILURE;
 }
 
 int
 del_entry(unsigned int idir, const char *basename)
 {
-    struct inode_s inode; 
-    file_desc_t _fd, *fd = &_fd;
-    struct entry_s entry; 
-    unsigned int ientry;
-    int status;
-    
-    /* a directory inode? */
-    read_inode(idir, &inode); 
-    if (inode.type != FILE_DIRECTORY) 
-	return RETURN_FAILURE;
-    
-    /* open the dir */
-    open_ifile(fd, idir);
+  struct inode_s inode;
+  file_desc_t _fd, *fd = &_fd;
+  struct entry_s entry;
+  unsigned int ientry;
+  int status;
 
-    /* the entry position in the file */
-    status = find_entry(fd, basename);
-    if (status == RETURN_FAILURE) {
-	close_ifile(fd);
-	return RETURN_FAILURE;
-    }
-    ientry = status; 
+  /* a directory inode? */
+  read_inode(idir, &inode);
+  if (inode.type != FILE_DIRECTORY)
+    return RETURN_FAILURE;
 
-    /* built a null entry */
-    memset(&entry, 0, sizeof(struct entry_s));
-    
-    /* seek to that entry */
-    seek2_ifile(fd, ientry * sizeof(struct entry_s));
+  /* open the dir */
+  open_ifile(fd, idir);
 
-    /* delete the entry = write the null entry */
-    status = write_ifile(fd, &entry, sizeof(struct entry_s));
-
-    /* close, and report status */
+  /* the entry position in the file */
+  status = find_entry(fd, basename);
+  if (status == RETURN_FAILURE) {
     close_ifile(fd);
-    return status;
+    return RETURN_FAILURE;
+  }
+  ientry = status;
+
+  /* built a null entry */
+  memset(&entry, 0, sizeof(struct entry_s));
+
+  /* seek to that entry */
+  seek2_ifile(fd, ientry * sizeof(struct entry_s));
+
+  /* delete the entry = write the null entry */
+  status = write_ifile(fd, &entry, sizeof(struct entry_s));
+
+  /* close, and report status */
+  close_ifile(fd);
+  return status;
 }
 
 /*------------------------------
   Looking after entries
   ------------------------------------------------------------*/
 
-/* consider the directory of inumber idir. 
-   search after an entry of name basename (which can not contain /). 
+/* consider the directory of inumber idir.
+   search after an entry of name basename (which can not contain /).
    return the inumber of the entry, 0 if no such entry or if idir is
    not a directory.
 */
 unsigned int
 inumber_of_basename(unsigned int idir, const char *basename)
 {
-    struct inode_s inode;
-    file_desc_t _fd, *fd = &_fd;
-    unsigned int ientry;
-    struct entry_s entry;
-    int status;
-    
-    /* a directory inode? */
-    read_inode(idir, &inode);
-    if (inode.type != FILE_DIRECTORY) 
-	return 0;
+  struct inode_s inode;
+  file_desc_t _fd, *fd = &_fd;
+  unsigned int ientry;
+  struct entry_s entry;
+  int status;
 
-    /* open the dir */
-    open_ifile(fd, idir);
+  printf("inumber_of_basename(%i,%s)\n", idir, basename);
+  /* a directory inode? */
+  read_inode(idir, &inode);
+  if (inode.type != FILE_DIRECTORY){
+    printf("inode is not a directory\n");
+    return 0;
+  }
 
-    /* the entry position in the file */
-    status = find_entry(fd, basename);
-    if (status == RETURN_FAILURE) 
-	return 0;
-    ientry = status; 
+  /* open the dir */
+  open_ifile(fd, idir);
 
-    /* seek to the right position */
-    seek2_ifile(fd, ientry * sizeof(struct entry_s));
-    
-    /* read the entry */
-    status = read_ifile(fd, &entry, sizeof(struct entry_s));
-    close_ifile(fd); 
+  /* the entry position in the file */
+  status = find_entry(fd, basename);
+  if (status == RETURN_FAILURE)
+    {
+      printf("did not find\n");
+      return 0;
+    }
+  ientry = status;
 
-    /* the result */
-    return entry.ent_inumber;
+  /* seek to the right position */
+  seek2_ifile(fd, ientry * sizeof(struct entry_s));
+
+  /* read the entry */
+  status = read_ifile(fd, &entry, sizeof(struct entry_s));
+  close_ifile(fd);
+
+  /* the result */
+  return entry.ent_inumber;
 }
 
 unsigned int
 inumber_of_path(const char *pathname)
 {
-    unsigned int icurrent; 	/* the inumber of the current dir */
-    
-    /* an *absolute* pathname */
-    if (*pathname != '/')
-	return ROOT_INODE;
+  unsigned int icurrent; 	/* the inumber of the current dir */
 
-    /* start at root */
-    icurrent = ROOT_INODE;
-    
-    while (*pathname) {
-	if (*pathname != '/') {
-	    char basename[ENTRYMAXLENGTH];
-	    char *pos;		/* the first / position */
-	    int lg; 		/* the length of the first basename */
-	    
-	    /* length of the leading basename */
-	    pos = strchr(pathname, '/');
-	    lg = pos ? pos - pathname : strlen (pathname);
+  printf("inumber_of_pathname(%s)\n",pathname);
+  
+  /* an *absolute* pathname */
+  if (*pathname != '/')
+    return 0;
 
-	    /* copy this leading basename to basename */
-	    strncpy (basename, pathname, min(ENTRYMAXLENGTH, lg));
-	    basename[min(ENTRYMAXLENGTH, lg)] = 0;
+  /* start at root */
+  icurrent = ROOT_INODE;
 
-	    /* look after this basename in the directory.
-	       this entry inumber is the new current */
-	    icurrent = inumber_of_basename(icurrent, basename); 
-	    if (! icurrent) 
-		return 0;
+  while (*pathname) {
+    if (*pathname != '/') {
+      char basename[ENTRYMAXLENGTH];
+      char *pos;		/* the first / position */
+      int lg; 		/* the length of the first basename */
 
-	    /* skip the basename in pathname */
-	    pathname += lg;
+      /* length of the leading basename */
+      pos = strchr(pathname, '/');
+      lg = pos ? pos - pathname : strlen (pathname);
 
-	    /* may end here */ 
-	    if (! *pathname) break;
-	}
-	pathname++ ;
+      /* copy this leading basename to basename */
+      strncpy (basename, pathname, min(ENTRYMAXLENGTH, lg));
+      basename[min(ENTRYMAXLENGTH, lg)] = 0;
+
+      /* look after this basename in the directory.
+         this entry inumber is the new current */
+      icurrent = inumber_of_basename(icurrent, basename);
+      if (! icurrent)
+        return 0;
+
+      /* skip the basename in pathname */
+      pathname += lg;
+
+      /* may end here */
+      if (! *pathname) break;
     }
-    return icurrent ;
+    pathname++ ;
+  }
+  return icurrent ;
 }
 
 unsigned int
 dinumber_of_path(const char *pathname, const char **basename)
 {
-    char *dirname = strdup(pathname);
-    unsigned int idirname = 0; 
-    struct inode_s inode; 
+  char *dirname = strdup(pathname);
+  unsigned int idirname = 0;
+  struct inode_s inode;
 
-    /* an *absolute* pathname */
-    if (*pathname != '/') 
+  /* an *absolute* pathname */
+  if (*pathname != '/')
     goto free;
-    
-    /* the last basename (there is at least a '/') */
-    *basename = strrchr (pathname, '/');
-    (*basename)++;
 
-    /* the dirname stops at the last '/'. ugly isn't it! */
-    *(dirname + ((*basename) - pathname)) = 0;
-    
-    /* the dirname inumber */
-    idirname = inumber_of_path(dirname);
-    if (! idirname)
-	goto free; 
+  /* the last basename (there is at least a '/') */
+  *basename = strrchr (pathname, '/');
+  (*basename)++;
 
-    /* is dirname a directory? */
-    read_inode(idirname, &inode); 
-    if (inode.type != FILE_DIRECTORY)
-	idirname = 0; 
+  /* the dirname stops at the last '/'. ugly isn't it! */
+  *(dirname + ((*basename) - pathname)) = 0;
+
+  /* the dirname inumber */
+  idirname = inumber_of_path(dirname);
+  if (! idirname)
+    goto free;
+
+  /* is dirname a directory? */
+  read_inode(idirname, &inode);
+  if (inode.type != FILE_DIRECTORY)
+    idirname = 0;
 
  free:
-    /* free dirname strdup() */
-    free(dirname); 
-    
-    return 23;
+  /* free dirname strdup() */
+  free(dirname);
+
+  return idirname;
 }
