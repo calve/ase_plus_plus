@@ -54,6 +54,7 @@ char* get_arguments(char* command_line){
 void do_help(){
   printf("List of built-in commands :\n");
   printf("  help\n");
+  printf("  mount volume\n");
   printf("  mkdir path\n");
 }
 
@@ -65,6 +66,13 @@ void do_mkdir(char* arguments){
   }
 }
 
+void do_mount(char* arguments){
+  int volume;
+  sscanf(arguments, "%i", &volume);
+  mount_volume(volume);
+}
+
+
 /* Evaluate a command runned inside the shell
  */
 int eval(char *cmd){
@@ -75,6 +83,10 @@ int eval(char *cmd){
   }
   if(!is_command(cmd, "mkdir")){
     do_mkdir(arguments);
+    return 0;
+  }
+  if(!is_command(cmd, "mount")){
+    do_mount(arguments);
     return 0;
   }
   printf("Unknow command\n");

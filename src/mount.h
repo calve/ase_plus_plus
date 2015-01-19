@@ -17,4 +17,7 @@
 void mount();
 void umount();
 
+/* Mount a specified volume */
+void mount_volume(int volume);
+
 #endif
