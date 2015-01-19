@@ -169,11 +169,9 @@ inumber_of_basename(unsigned int idir, const char *basename)
   struct entry_s entry;
   int status;
 
-  printf("inumber_of_basename(%i,%s)\n", idir, basename);
   /* a directory inode? */
   read_inode(idir, &inode);
   if (inode.type != FILE_DIRECTORY){
-    printf("inode is not a directory\n");
     return 0;
   }
 
@@ -184,7 +182,6 @@ inumber_of_basename(unsigned int idir, const char *basename)
   status = find_entry(fd, basename);
   if (status == RETURN_FAILURE)
     {
-      printf("did not find\n");
       return 0;
     }
   ientry = status;
@@ -204,8 +201,6 @@ unsigned int
 inumber_of_path(const char *pathname)
 {
   unsigned int icurrent; 	/* the inumber of the current dir */
-
-  printf("inumber_of_pathname(%s)\n",pathname);
 
   /* an *absolute* pathname */
   if (*pathname != '/')

@@ -72,7 +72,6 @@ open_file(file_desc_t *fd, const char *pathname)
 
     /* convert the pathname into an inumber */  
     inumber = inumber_of_path(pathname);
-    printf("%d\n", inumber);
     if (! inumber)
 	return RETURN_FAILURE; 
 
