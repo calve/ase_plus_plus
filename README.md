@@ -6,6 +6,10 @@
     |- include   # Contient surtou ``hardware.h``
     |- lib       # Contient les librairies externes
 
+# Dépendance
+
+La bibliothèque ``readline`` pour architecture 32 bits est requise pour compiler le shell
+
 # Compilation
 
 À la racine du projet, ``make`` compile le projet et déplace les binaires dans ``bin/``
@@ -13,6 +17,22 @@
 # Éxecution
 
 Il faut s'assurer de diposer de ``hardware.ini`` dans le dossier courant. Puis lancer le binaire
+
+## Utilisation du shell
+
+Exemple d'utilisation du shell ``./bin/shell``
+
+```
+/>help
+List of built-in commands :
+help
+mount volume
+mkdir path
+/>mount 0
+/>mkdir /plop
+inumber_of_pathname(/)
+/>^D
+```
 
 # Test
 

@@ -15,7 +15,7 @@ LIBS    = -lhardware
 ###------------------------------
 ### Main targets
 ###------------------------------------------------------------
-BINARIES= mkhd dmps frmt vm mkvol dvol mknfs dfs if_pfile if_nfile if_cfile if_dfile
+BINARIES= mkhd dmps frmt vm mkvol dvol mknfs dfs if_pfile if_nfile if_cfile if_dfile shell
 OBJECTS	= $(addsuffix .o,\
 	  drive mbr tools ifile mount inode superbloc dir file)
 
@@ -48,6 +48,8 @@ if_dfile: if_dfile.o $(OBJECTS)
 	$(CC) $(CFLAGS) -o $(BINDIR)/$@ $^ $(LIBDIR) $(LIBS)
 if_pfile: if_pfile.o ifile.o $(OBJECTS)
 	$(CC) $(CFLAGS) -o $(BINDIR)/$@ $^ $(LIBDIR) $(LIBS)
+shell: shell.o ifile.o $(OBJECTS)
+	$(CC) $(CFLAGS) -lreadline -o $(BINDIR)/$@ $^ $(LIBDIR) $(LIBS)
 
 ###------------------------------
 ### #include dependences 
@@ -77,7 +79,7 @@ mount.o: mount.c config.h tools.h inode.h mbr.h superbloc.h drive.h
 tools.o: tools.c tools.h
 file.o: file.c file.h dir.h ifile.h inode.h tools.h mount.h
 dir.o: dir.c dir.h ifile.h inode.h tools.h mount.h
-
+shell.o: shell.c ifile.h inode.h tools.h mount.h dir.h file.h
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< $(INCDIR)
