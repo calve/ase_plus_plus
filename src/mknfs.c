@@ -105,8 +105,6 @@ int main(int argc, char** argv)
         scanf("%i", &nbblocs);
 
     }
-    format_vol(vol);
-    printf("Formated\n");
     init_super(vol, serial, test);
 
     printf("Taux d'occupation : %f/100\n", taux_occupation(vol));
