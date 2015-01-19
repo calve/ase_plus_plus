@@ -54,8 +54,20 @@ char* get_arguments(char* command_line){
 void do_help(){
   printf("List of built-in commands :\n");
   printf("  help\n");
+  printf("  ls\n");
   printf("  mount volume\n");
   printf("  mkdir path\n");
+}
+
+/* Print the current working directory only for the moment */
+void do_ls(){
+  file_desc_t current;
+  struct entry_s entry;
+  open_file(&current, cwd);
+  while (read_ifile (&current, &entry, sizeof(struct entry_s)) != READ_EOF){
+    printf("%s ",entry.ent_basename);
+  }
+  printf("\n");
 }
 
 void do_mkdir(char* arguments){
@@ -79,6 +91,10 @@ int eval(char *cmd){
   char *arguments = get_arguments(cmd);
   if(!is_command(cmd, "help")){
     do_help();
+    return 0;
+  }
+  if(!is_command(cmd, "ls")){
+    do_ls();
     return 0;
   }
   if(!is_command(cmd, "mkdir")){
