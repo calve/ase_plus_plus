@@ -68,6 +68,7 @@ void do_ls(){
     printf("%s ",entry.ent_basename);
   }
   printf("\n");
+  close_file(&current);
 }
 
 void do_mkdir(char* arguments){
