@@ -61,6 +61,7 @@ void do_help(){
   printf("List of built-in commands :\n");
   printf("  cat\n");
   printf("  cd\n");
+  printf("  ed (the EDitor)\n");
   printf("  help\n");
   printf("  ls\n");
   printf("  mount volume\n");
@@ -108,6 +109,36 @@ void do_cd(char* arguments){
   }
 }
 
+/* ed is the standart editor */
+void do_ed(char* arguments){
+  file_desc_t fd;
+  unsigned int inumber;
+  int status;
+  int c;
+  char target[MAXPROMPT];
+  absolute_path(target, arguments);
+
+  inumber = create_file(target, FILE_FILE);
+  if (inumber == RETURN_FAILURE ){
+    printf("erreur creation fichier");
+    printf("%u\n", inumber);
+    return;
+  }
+
+  status = open_ifile(&fd, inumber);
+  if (status != RETURN_SUCCESS){
+    printf("erreur ouverture fichier %d", inumber);
+    return;
+  }
+  printf("your move :\n");
+  while((c=getchar()) != EOF)
+    {
+      writec_ifile(&fd, c);
+    }
+  close_file(&fd);
+  printf("\n");
+}
+
 /* Print the current working directory only for the moment */
 void do_ls(){
   file_desc_t current;
@@ -149,6 +180,10 @@ int eval(char *cmd){
   }
   if(!is_command(cmd, "cd")){
     do_cd(arguments);
+    return 0;
+  }
+  if(!is_command(cmd, "ed")){
+    do_ed(arguments);
     return 0;
   }
   if(!is_command(cmd, "help")){
