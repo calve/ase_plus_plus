@@ -21,8 +21,8 @@
   File creation and deletion
   ------------------------------------------------------------*/
 
-/* return RETURN_FAILURE in of failure (pre-existing file, full
-   volume...) */ 
+/* return RETURN_FAILURE in case of failure (pre-existing file, full
+   volume...) */
 int create_file(const char *pathname, enum file_type_e type);
 
 /* return RETURN_FAILURE in of failure (non pre-existing file, non
