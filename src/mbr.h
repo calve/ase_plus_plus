@@ -33,7 +33,7 @@ void write_mbr ();
 void read_bloc(unsigned int vol, unsigned int nbloc, unsigned char *buffer);
 void read_nbloc(unsigned int vol, unsigned int nbloc, unsigned char *buffer, int size);
 void write_bloc(unsigned int vol, unsigned int nbloc, const unsigned char *buffer);
-void write_nbloc(unsigned int vol, unsigned int nbloc, const unsigned char *buffer, int size);
+void write_nbloc(unsigned int vol, unsigned int nbloc, unsigned char *buffer, int size);
 void format_vol(unsigned int vol);
 
 /* Commandes annexes */

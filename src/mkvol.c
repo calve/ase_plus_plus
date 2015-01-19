@@ -9,7 +9,7 @@
 #include "mbr.h"
 
 void print_help(char* program_name){
-  printf("usage %s --cylinder first_cylinder --sector first_sector --size block_size --type volume_type --name volume_name --serial\n", program_name);
+  printf("usage %s --cylinder first_cylinder --sector first_sector --size block_size --type volume_type\n", program_name);
 }
 
 int main(int argc, char** argv){
@@ -18,18 +18,14 @@ int main(int argc, char** argv){
   int cylinder = -1;
   int size = -1;
   int opt = 0;
-  int serial = 0;
   char* input_voltype="";
-  char* volume_name="";
   int long_index =0;
 
   /* Specifying the expected options */
   static struct option long_options[] = {
     {"cylinder", required_argument, 0, 'c' },
     {"help", no_argument, 0, 'h' },
-    {"name", required_argument, 0, 'N' },
     {"sector", required_argument, 0, 's' },
-    {"serial", required_argument, 0, 'a' },
     {"size", required_argument, 0, 'S' },
     {"type", required_argument, 0, 't' },
     {0, 0, 0, 0 }
@@ -81,16 +77,6 @@ int main(int argc, char** argv){
         fprintf(stderr, "Could not parse volume type\n");
         exit(2);
       }
-      break;
-    case 'N' :
-      volume_name = optarg;
-      break;
-    case 'a':
-      if (sscanf (optarg, "%i", &intvar)!=1){
-        fprintf(stderr, "error - argument serial not an integer\n");
-        exit(2);
-      }
-      serial = atoi(optarg);
       break;
     default:
       print_help(argv[0]);
