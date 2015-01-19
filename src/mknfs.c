@@ -10,7 +10,7 @@
 #include "superbloc.h"
 
 void print_help(char* program_name){
-    printf("usage %s --volume volume --serial serial --size block_size\n", program_name);
+    printf("usage %s --volume volume --serial serial --size block_size --name volume_name\n", program_name);
 }
 
 int volume_loop()
@@ -38,7 +38,7 @@ int main(int argc, char** argv)
     int nbblocs = -1;
     int opt = 0;
     int long_index = 0;
-    char test[32] = "test";
+    char name[32] = "";
 
     /* Specifying the expected options */
     static struct option long_options[] = {
@@ -46,13 +46,14 @@ int main(int argc, char** argv)
         {"serial", required_argument, 0, 's' },
         {"size", required_argument, 0, 'l' },
         {"volume", required_argument, 0, 'v' },
+        {"name", required_argument, 0, 'n' },
         {0, 0, 0, 0 }
     };
 
     /* Parsing options */
     opterr = 0;
 
-    while ((opt = getopt_long(argc, argv, "c:s:S:t:N:a:", long_options, &long_index )) != -1) {
+    while ((opt = getopt_long(argc, argv, "h:s:l:v:n:", long_options, &long_index )) != -1) {
         switch (opt) {
             int intvar;
         case 'h' :
@@ -80,6 +81,9 @@ int main(int argc, char** argv)
             }
             vol = atoi(optarg);
             break;
+        case 'n':
+            strncpy(name, optarg, 32);
+            break;
         default:
             print_help(argv[0]);
             exit(EXIT_FAILURE);
@@ -105,7 +109,7 @@ int main(int argc, char** argv)
         scanf("%i", &nbblocs);
 
     }
-    init_super(vol, serial, test);
+    init_super(vol, serial, name);
 
     printf("Taux d'occupation : %f/100\n", taux_occupation(vol));
 
