@@ -23,22 +23,23 @@ void init_super(unsigned int vol, unsigned int num_serie, char nom[32])
 	super.id = 0;
 	super.premier_libre = 1;
 	super.nb_bloc_libre = 0;
+        super.root_inumber = -1; /* No root yet */
 	current_volume = vol;
 
         /* initialisation de la liste des blocs */
         for (i = 1; i < (mbr.mbr_vol[current_volume].vol_nsectors); i++){
             struct free_bloc_s block;
-            struct free_bloc_s in_bloc;
             block.magic = BLOC_MAGIC;
             block.next_free = (i < mbr.mbr_vol[current_volume].vol_nsectors - 1 ? i+1 : BLOC_NULL);
             write_nbloc(current_volume, i, (unsigned char*)&block, sizeof(block));
             super.nb_bloc_libre++;
 
-            /* Check bloc */
-            read_nbloc(current_volume, i, (unsigned char*)&in_bloc, sizeof(in_bloc));
-            assert(in_bloc.magic == BLOC_MAGIC);
+            if (i % 100 == 0){
+                printf("chained block %i\n", i);
+            }
         }
         save_super();
+        super.root_inumber = create_ifile(FILE_DIRECTORY);
         assert(super.magic == SUPER_MAGIC);
 }
 

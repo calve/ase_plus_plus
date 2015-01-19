@@ -17,12 +17,13 @@ struct free_bloc_s
 
 struct superbloc_s
 {
-	unsigned int magic;
-	int numero;
-	char nom[32];
-	int id;
-	unsigned int premier_libre;
-	unsigned int nb_bloc_libre;
+    unsigned int magic;
+    int numero;
+    char nom[32];
+    int id;
+    unsigned int premier_libre;
+    unsigned int nb_bloc_libre;
+    unsigned int root_inumber;
 };
 
 void init_super(unsigned int vol, unsigned int num_serie, char nom[32]);
