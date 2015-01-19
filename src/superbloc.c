@@ -40,6 +40,7 @@ void init_super(unsigned int vol, unsigned int num_serie, char nom[32])
         }
         save_super();
         super.root_inumber = create_ifile(FILE_DIRECTORY);
+        save_super();
         assert(super.magic == SUPER_MAGIC);
 }
 
