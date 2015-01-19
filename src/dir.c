@@ -206,13 +206,13 @@ inumber_of_path(const char *pathname)
   unsigned int icurrent; 	/* the inumber of the current dir */
 
   printf("inumber_of_pathname(%s)\n",pathname);
-  
+
   /* an *absolute* pathname */
   if (*pathname != '/')
     return 0;
 
   /* start at root */
-  icurrent = ROOT_INODE;
+  icurrent = super.root_inumber;
 
   while (*pathname) {
     if (*pathname != '/') {
