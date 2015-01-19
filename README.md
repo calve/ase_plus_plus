@@ -22,6 +22,18 @@ Il faut s'assurer de diposer de ``hardware.ini`` dans le dossier courant. Puis l
 
 ``make test`` lance une suite de test qui crée un disque virtuel, crée des partitions, des fichiers …
 
+## Créer un fichier nommé
+
+    $ CURRENT_VOLUME=0 ./bin/if_nfile
+    Saisissez un nom de fichier :
+    /monfichier
+    inumber_of_pathname(/)
+    9
+    Le texte de mon fichier
+    ^D
+    $ CURRENT_VOLUME=0 ./bin/if_pfile "/monfichier"
+    Le texte de mon fichier
+
 # Todo
 
 Intégrer if_nfile, if_pfile et if_cfile dans un premier temps.
