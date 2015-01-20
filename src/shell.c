@@ -240,7 +240,7 @@ int main(int argc, char** argv){
         fflush(stdin);
       }
 
-    free(cmdline); /* As been allocated by readline */
+    free(cmdline); /* Has been allocated by readline */
   }
   umount();
   exit(EXIT_SUCCESS); /* control never reaches here */
