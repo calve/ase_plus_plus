@@ -211,8 +211,9 @@ int main(int argc, char** argv){
   /* Initialize history */
   using_history();
 
-  printf("\nType help to find out all the available commands in this shell\n\n");
-
+  printf("Type ``help`` to find out all the available commands in this shell\n\n");
+  mount_volume(0);
+  printf("Volume 0 has been automatically mounted. Use ``mount`` to mount another\n");
   /* Execute the shell's read/eval loop */
   while (1) {
     char prompt[MAXPROMPT];
@@ -226,8 +227,7 @@ int main(int argc, char** argv){
 
     if (!cmdline) {    /* End of file (ctrl-d) */
       printf("\n");    /* Give a clean prompt to user */
-      fflush(stdout);
-      exit(EXIT_SUCCESS);
+      break;
     }
 
 
@@ -243,5 +243,6 @@ int main(int argc, char** argv){
     free(cmdline); /* Has been allocated by readline */
   }
   umount();
-  exit(EXIT_SUCCESS); /* control never reaches here */
+  fflush(stdout);
+  exit(EXIT_SUCCESS);
 }
