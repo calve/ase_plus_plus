@@ -51,9 +51,6 @@ void absolute_path(char* target, char* path){
   if (*path != '/'){
     strcpy(target, cwd);
   }
-  else{
-    strcpy(target, "");
-  }
   strcat(target, path);
 }
 
