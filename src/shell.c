@@ -149,11 +149,14 @@ void do_ed(char* arguments){
 }
 
 /* Print the current working directory only for the moment */
-void do_ls(){
+void do_ls(char* arguments){
   file_desc_t current;
   struct entry_s entry;
   int counter = 0;
-  open_file(&current, cwd);
+  char target[MAXPROMPT];
+
+  canonical_path(target, arguments);
+  open_file(&current, target);
   while (read_ifile (&current, &entry, sizeof(struct entry_s)) != READ_EOF){
     printf("%s ",entry.ent_basename);
     counter++;
@@ -200,7 +203,7 @@ int eval(char *cmd){
     return 0;
   }
   if(!is_command(cmd, "ls")){
-    do_ls();
+    do_ls(arguments);
     return 0;
   }
   if(!is_command(cmd, "mkdir")){
