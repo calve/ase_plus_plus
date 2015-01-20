@@ -40,6 +40,7 @@ int construct_prompt(char* string, int string_size)
   return 0;
 }
 
+
 /* Test if this command line should invoque command
  * examples :
  * is_command("mkdir plop plop", "mkdir") -> true
@@ -61,6 +62,7 @@ char* get_arguments(char* command_line){
     return "";
 }
 
+
 /* Construct the canonical path of ``path`` and store it in ``target``
  * returns a canonical path that starts at ``/`` and should not contains ``.`` (dot) or ``..`` (double dot)
  */
@@ -74,9 +76,9 @@ void canonical_path(char* target, char* path){
   verbose("canonical path : %s\n", target);
 }
 
+
 /* Maintain a compact list of all builtins commands with their usage
  */
-
 void do_help(){
   printf("List of built-in commands :\n");
   printf("  cat path\n");
@@ -88,6 +90,7 @@ void do_help(){
   printf("  mkdir path\n");
   printf("  rm path\n");
 }
+
 
 /* Above are listed all builtins commands
  * Keep them ordered !
@@ -113,6 +116,7 @@ void do_cat(char* arguments){
   printf("\n");
 }
 
+
 void do_cd(char* arguments){
   int status;
   char target[MAXPROMPT];
@@ -132,6 +136,7 @@ void do_cd(char* arguments){
     strcpy(cwd, target);
   }
 }
+
 
 /* ed is the standard editor */
 void do_ed(char* arguments){
@@ -164,6 +169,7 @@ void do_ed(char* arguments){
   printf("\n");
 }
 
+
 /* Print the current working directory only for the moment */
 void do_ls(char* arguments){
   file_desc_t current;
@@ -183,6 +189,7 @@ void do_ls(char* arguments){
   close_file(&current);
 }
 
+
 void do_mkdir(char* arguments){
   int status;
   char target[MAXPROMPT];
@@ -194,11 +201,13 @@ void do_mkdir(char* arguments){
   }
 }
 
+
 void do_mount(char* arguments){
   int volume;
   sscanf(arguments, "%i", &volume);
   mount_volume(volume);
 }
+
 
 void do_rm(char* arguments){
   int status;
@@ -210,6 +219,7 @@ void do_rm(char* arguments){
     printf("Error removing %s", target);
   }
 }
+
 
 /* Evaluate a command runned inside the shell
  */
