@@ -14,8 +14,18 @@
 
 #define MAXPROMPT 256
 
+/* This macro should be used like printf
+ * it will output only if we are in verbose mode
+ */
+#define verbose(format, ...) do {                 \
+    if (is_verbose)                               \
+      fprintf(stdout, format, ##__VA_ARGS__);     \
+  } while(0)
+
 char cwd[MAXPROMPT] = "/";
 const char* shellsymbol = ">";
+int is_verbose = 0;
+
 
 int construct_prompt(char* string, int string_size)
 {
@@ -61,6 +71,7 @@ void canonical_path(char* target, char* path){
   } else {
     strcpy(target, path);
   }
+  verbose("canonical path : %s\n", target);
 }
 
 /* Maintain a compact list of all builtins commands with their usage
@@ -244,6 +255,11 @@ int eval(char *cmd){
 int main(int argc, char** argv){
   /* Initialize history */
   using_history();
+
+  if (argc > 1 && strcmp(argv[1], "-v") == 0){
+    is_verbose = 1;
+    printf("Set verbose flag\n");
+  }
 
   printf("Welcome in shell. Build date %s %s\n", __DATE__, __TIME__);
   printf("Type ``help`` to find out all the available commands in this shell\n");
