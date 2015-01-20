@@ -89,7 +89,10 @@ void do_cat(char* arguments){
   canonical_path(target, arguments);
 
   status = open_file(&fd, target);
-  ffatal(!status, "erreur ouverture fichier %s", target);
+  if (status == RETURN_FAILURE){
+    printf("Cannot open %s\n", target);
+    return;
+  }
 
   while((c=readc_file(&fd)) != READ_EOF)
     putchar(c);
