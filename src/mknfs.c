@@ -10,7 +10,7 @@
 #include "superbloc.h"
 
 void print_help(char* program_name){
-    printf("usage %s --volume volume --serial serial --size block_size --name volume_name\n", program_name);
+    printf("usage %s --volume volume --serial serial --name volume_name\n", program_name);
 }
 
 int volume_loop()
@@ -35,7 +35,6 @@ int main(int argc, char** argv)
 {
     int vol = -1;
     int serial = -1;
-    int nbblocs = -1;
     int opt = 0;
     int long_index = 0;
     char name[32] = "";
@@ -67,13 +66,6 @@ int main(int argc, char** argv)
             }
             serial = atoi(optarg);
             break;
-        case 'l' :
-            if (sscanf (optarg, "%i", &intvar)!=1){
-                fprintf(stderr, "error - argument size not an integer\n");
-                exit(2);
-            }
-            nbblocs = atoi(optarg);
-            break;
         case 'v' :
             if (sscanf (optarg, "%i", &intvar)!=1){
                 fprintf(stderr, "error - argument volume not an integer\n");
@@ -91,11 +83,10 @@ int main(int argc, char** argv)
     }
 
     init_mbr();
-    if (vol < 0 || serial < 0 || nbblocs < 0)
+    if (vol < 0 || serial < 0)
       {
         list_volumes();
       }
-    /* write_mbr(); */ /* What the point ? */
 
     if (vol < 0){
         vol = volume_loop();
@@ -103,11 +94,6 @@ int main(int argc, char** argv)
     if (serial < 0){
         printf("Saisir le numero de série:\n");
         scanf("%i", &serial);
-    }
-    if (nbblocs < 0){
-        printf("Saisir le nombre de blocs:\n");
-        scanf("%i", &nbblocs);
-
     }
     init_super(vol, serial, name);
 

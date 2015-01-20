@@ -18,6 +18,14 @@ La bibliothèque ``readline`` pour architecture 32 bits est requise pour compile
 
 Il faut s'assurer de diposer de ``hardware.ini`` dans le dossier courant. Puis lancer le binaire
 
+## Création du disque virtuel
+
+```
+./bin/mkhd
+./bin/mkvol --cylinder 1 --sector 1 --size 16000 --type base
+./bin/mknfs --volume 0 --serial 4242 --name thenameisbill
+```
+
 ## Utilisation du shell
 
 Exemple d'utilisation du shell ``./bin/shell``
