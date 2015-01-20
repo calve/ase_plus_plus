@@ -68,11 +68,11 @@ void canonical_path(char* target, char* path){
 
 void do_help(){
   printf("List of built-in commands :\n");
-  printf("  cat\n");
-  printf("  cd\n");
-  printf("  ed (the EDitor)\n");
+  printf("  cat path\n");
+  printf("  cd path\n");
+  printf("  ed path (the EDitor)\n");
   printf("  help\n");
-  printf("  ls\n");
+  printf("  ls [path]\n");
   printf("  mount volume\n");
   printf("  mkdir path\n");
 }
