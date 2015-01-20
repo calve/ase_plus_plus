@@ -245,9 +245,11 @@ int main(int argc, char** argv){
   /* Initialize history */
   using_history();
 
-  printf("Type ``help`` to find out all the available commands in this shell\n\n");
+  printf("Welcome in shell. Build date %s %s\n", __DATE__, __TIME__);
+  printf("Type ``help`` to find out all the available commands in this shell\n");
   mount_volume(0);
   printf("Volume 0 has been automatically mounted. Use ``mount`` to mount another\n");
+  printf("\n");
   /* Execute the shell's read/eval loop */
   while (1) {
     char prompt[MAXPROMPT];
