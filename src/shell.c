@@ -75,6 +75,7 @@ void do_help(){
   printf("  ls [path]\n");
   printf("  mount volume\n");
   printf("  mkdir path\n");
+  printf("  rm path\n");
 }
 
 /* Above are listed all builtins commands
@@ -185,6 +186,16 @@ void do_mount(char* arguments){
   mount_volume(volume);
 }
 
+void do_rm(char* arguments){
+  int status;
+  char target[MAXPROMPT];
+  canonical_path(target, arguments);
+
+  status = delete_file(target);
+  if (status == RETURN_FAILURE){
+    printf("Error removing %s", target);
+  }
+}
 
 /* Evaluate a command runned inside the shell
  */
@@ -216,6 +227,10 @@ int eval(char *cmd){
   }
   if(!is_command(cmd, "mount")){
     do_mount(arguments);
+    return 0;
+  }
+  if(!is_command(cmd, "rm")){
+    do_rm(arguments);
     return 0;
   }
   printf("Unknow command\n");
