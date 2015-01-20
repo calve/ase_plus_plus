@@ -174,9 +174,12 @@ void do_ls(char* arguments){
 
 void do_mkdir(char* arguments){
   int status;
-  status = create_file(arguments, FILE_DIRECTORY);
+  char target[MAXPROMPT];
+
+  canonical_path(target, arguments);
+  status = create_file(target, FILE_DIRECTORY);
   if (status == RETURN_FAILURE){
-    printf("Failed to create %s\n", arguments);
+    printf("Failed to create %s\n", target);
   }
 }
 
