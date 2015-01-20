@@ -47,11 +47,16 @@ char* get_arguments(char* command_line){
   return strchr(command_line, ' ')+1;;
 }
 
-void absolute_path(char* target, char* path){
+/* Construct the canonical path of ``path`` and store it in ``target``
+ * returns a canonical path that starts at ``/`` and should not contains ``.`` (dot) or ``..`` (double dot)
+ */
+void canonical_path(char* target, char* path){
   if (*path != '/'){
     strcpy(target, cwd);
+    strcat(target, path);
+  } else {
+    strcpy(target, path);
   }
-  strcat(target, path);
 }
 
 /* Maintain a compact list of all builtins commands with their usage
@@ -77,7 +82,7 @@ void do_cat(char* arguments){
   int status;
   int c;
   char target[MAXPROMPT];
-  absolute_path(target, arguments);
+  canonical_path(target, arguments);
 
   status = open_file(&fd, target);
   ffatal(!status, "erreur ouverture fichier %s", target);
@@ -92,7 +97,7 @@ void do_cat(char* arguments){
 void do_cd(char* arguments){
   int status;
   char target[MAXPROMPT];
-  absolute_path(target, arguments);
+  canonical_path(target, arguments);
 
   /* Always append a final '/' */
   if (target[strlen(target)-1] != '/'){
@@ -116,7 +121,7 @@ void do_ed(char* arguments){
   int status;
   int c;
   char target[MAXPROMPT];
-  absolute_path(target, arguments);
+  canonical_path(target, arguments);
 
   inumber = create_file(target, FILE_FILE);
   if (inumber == RETURN_FAILURE ){
