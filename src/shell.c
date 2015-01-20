@@ -118,7 +118,7 @@ void do_cd(char* arguments){
   }
 }
 
-/* ed is the standart editor */
+/* ed is the standard editor */
 void do_ed(char* arguments){
   file_desc_t fd;
   unsigned int inumber;
@@ -127,19 +127,20 @@ void do_ed(char* arguments){
   char target[MAXPROMPT];
   canonical_path(target, arguments);
 
+  printf("please wait ...");
+  fflush(stdout);
   inumber = create_file(target, FILE_FILE);
   if (inumber == RETURN_FAILURE ){
     printf("erreur creation fichier");
     printf("%u\n", inumber);
     return;
   }
-
   status = open_ifile(&fd, inumber);
   if (status != RETURN_SUCCESS){
     printf("erreur ouverture fichier %d", inumber);
     return;
   }
-  printf("your move :\n");
+  printf(" file opened, you can now enter your text\n");
   while((c=getchar()) != EOF)
     {
       writec_ifile(&fd, c);
@@ -241,7 +242,6 @@ int main(int argc, char** argv){
       printf("\n");    /* Give a clean prompt to user */
       break;
     }
-
 
     /* Evaluate the command line */
     if (cmdline[0] != '\0') /* evaluate the command line only it is not empty */
