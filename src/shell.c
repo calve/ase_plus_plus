@@ -14,7 +14,7 @@
 
 #define MAXPROMPT 256
 
-char cwd[MAX_DIR_SIZE] = "/";
+char cwd[MAXPROMPT] = "/";
 const char* shellsymbol = ">";
 
 int construct_prompt(char* string, int string_size)
