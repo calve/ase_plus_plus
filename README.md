@@ -1,10 +1,12 @@
 # Structure
 
     |
-    |- src       # Contient les sources ``.c`` et ``.h``
-    |- bin       # Contient les binaires compilés
-    |- include   # Contient surtou ``hardware.h``
-    |- lib       # Contient les librairies externes
+    |- src           # Contient les sources ``.c`` et ``.h``
+    |- bin           # Contient les binaires compilés
+    |- include       # Contient surtout ``hardware.h``
+    |- lib           # Contient les librairies externes
+    |- vdiskA.bin    # Le disque dur virtuel
+    |- hardware.ini  # Configuration du materiel virtuel
 
 # Dépendance
 
@@ -16,31 +18,54 @@ La bibliothèque ``readline`` pour architecture 32 bits est requise pour compile
 
 # Éxecution
 
-Il faut s'assurer de diposer de ``hardware.ini`` dans le dossier courant. Puis lancer le binaire
+Il faut s'assurer de diposer de ``hardware.ini`` dans le dossier courant.
+
+Il faut créer un disque virtuel une première fois, ensuite, seul le shell suffit.
 
 ## Création du disque virtuel
 
-```
-./bin/mkhd
-./bin/mkvol --cylinder 1 --sector 1 --size 16000 --type base
-./bin/mknfs --volume 0 --serial 4242 --name thenameisbill
-```
+Lancer les commandes suivantes pour créer un disque virtuel, et initialiser un système de fichier dessus
+
+    ./bin/mkhd
+    ./bin/mkvol --cylinder 1 --sector 1 --size 16000 --type base
+    ./bin/mknfs --volume 0 --serial 4242 --name thenameisbill
 
 ## Utilisation du shell
 
 Exemple d'utilisation du shell ``./bin/shell``
 
-```
-/>help
-List of built-in commands :
-help
-mount volume
-mkdir path
-/>mount 0
-/>mkdir /plop
-inumber_of_pathname(/)
-/>^D
-```
+    Welcome in shell. Build date Jan 20 2015 16:09:59
+    Type ``help`` to find out all the available commands in this shell
+    Volume 0 has been automatically mounted. Use ``mount`` to mount another
+    
+    />help
+    List of built-in commands :
+    cat path
+    cd path
+    ed path (the EDitor)
+    help
+    ls [path]
+    mount volume
+    mkdir path
+    rm path
+    />ls
+    bepo
+    />cd bepo
+    /bepo/>ed fichier
+    please wait ... file opened, you can now enter your text
+    ceci est le contenu de mon fichier
+    avec une
+    nouvelle ligne. Je termine l'entrée avec un retour à la ligne puis EOF (^D)
+    
+    /bepo/>cat fichier
+    ceci est le contenu de mon fichier
+    avec une
+    nouvelle ligne. Je termine l'entrée avec un retour à la ligne puis EOF (^D)
+    
+    /bepo/>rm fichier
+    /bepo/>cat fichier
+    Cannot open /bepo/fichier
+    /bepo/>
 
 # Test
 
@@ -60,15 +85,7 @@ inumber_of_pathname(/)
 
 # Todo
 
-Un shell qui permet d'interagir avec le système de fichier :
-
-  + ls
-  + cd
-  + mkdir
-  + cat
-  + creation de fichier
-
-On peut regarder la bibliothèque ``cliparser`` pour gérer le coté shell interactif
+voir sceance2.md
 
 # BUGS
 
