@@ -44,7 +44,11 @@ int is_command(char* command_line, char* command){
 /* Returns a pointer to the first argument of a command line
  */
 char* get_arguments(char* command_line){
-  return strchr(command_line, ' ')+1;;
+  char* index = strchr(command_line, ' ');
+  if (index)
+    return index+1;
+  else
+    return "";
 }
 
 /* Construct the canonical path of ``path`` and store it in ``target``
