@@ -310,6 +310,8 @@ int main(int argc, char** argv){
   if (argc > 1 && strcmp(argv[1], "-v") == 0){
     is_verbose = 1;
     printf("Set verbose flag\n");
+  } else {
+    printf("Verbose flag not set. Use -v if you want to\n");
   }
 
   printf("Welcome in shell. Build date %s %s\n", __DATE__, __TIME__);
