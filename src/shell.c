@@ -275,7 +275,7 @@ int eval(char *cmd){
   }
   if(!is_command(cmd, "cp")){
     arg1 = get_arguments(arguments);
-    do_cp(arguments, arg1);
+    do_cp(arg1, arguments);
     return 0;
   }
   if(!is_command(cmd, "help")){
