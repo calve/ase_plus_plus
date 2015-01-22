@@ -82,19 +82,22 @@ void canonical_path(char* target, char* path){
 void do_help(){
   printf("List of built-in commands :\n");
   printf("  cat path\n");
-  printf("  cd path\n");
+  printf("  cd absolute_path\n");
   printf("  ed path (the EDitor)\n");
   printf("  help\n");
   printf("  ls [path]\n");
   printf("  mount volume\n");
   printf("  mkdir path\n");
   printf("  rm path\n");
+  printf("  rmdir path\n");
+  printf("  cp source target\n");
 }
 
 
 /* Above are listed all builtins commands
  * Keep them ordered !
  */
+
 
 void do_cat(char* arguments){
   file_desc_t fd;
@@ -169,6 +172,38 @@ void do_ed(char* arguments){
   printf("\n");
 }
 
+void do_cp(char* source, char* dest){
+  file_desc_t sfd, dfd;
+  unsigned int inumber;
+  int status;
+  int c;
+  char target[MAXPROMPT];
+  canonical_path(target, dest);
+  
+  inumber = create_file(target, FILE_FILE);
+  if (inumber == RETURN_FAILURE){
+    printf("erreur creation fichier");
+    printf("%u\n", inumber);
+    return;
+  }
+
+  status = open_ifile(&dfd, inumber);
+  if (status != RETURN_SUCCESS){
+    printf("erreur ouverture fichier %d", inumber);
+    return;
+  }
+  canonical_path(target, source);
+  status = open_file(&sfd, target);
+  if (status != RETURN_SUCCESS){
+    printf("cannot open %s\n", target);
+    return;
+  }
+
+  while((c=readc_file(&sfd)) != READ_EOF)
+    writec_file(&dfd, c);
+  close_file(&dfd);
+  close_file(&sfd);
+}
 
 /* Print the current working directory only for the moment */
 void do_ls(char* arguments){
@@ -224,6 +259,7 @@ void do_rm(char* arguments){
 /* Evaluate a command runned inside the shell
  */
 int eval(char *cmd){
+  char *arg1;
   char *arguments = get_arguments(cmd);
   if(!is_command(cmd, "cat")){
     do_cat(arguments);
@@ -235,6 +271,11 @@ int eval(char *cmd){
   }
   if(!is_command(cmd, "ed")){
     do_ed(arguments);
+    return 0;
+  }
+  if(!is_command(cmd, "cp")){
+    arg1 = get_arguments(arguments);
+    do_cp(arguments, arg1);
     return 0;
   }
   if(!is_command(cmd, "help")){

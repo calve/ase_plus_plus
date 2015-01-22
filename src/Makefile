@@ -10,7 +10,7 @@ CFLAGS  += -g -m32
 BINDIR = $(ROOTDIR)/bin
 LIBDIR  = -L$(ROOTDIR)/lib
 INCDIR  = -I$(ROOTDIR)/include
-LIBS    = -lhardware
+LIBS    = -lhardware -lreadline
 
 ###------------------------------
 ### Main targets
