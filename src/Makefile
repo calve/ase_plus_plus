@@ -4,8 +4,8 @@
 ROOTDIR=../
 
 CC	= gcc
-CFLAGS	= -Wall -ansi -pedantic
-CFLAGS  += -std=iso9899:1999
+CFLAGS	= -Wall -pedantic
+CFLAGS  +=  -std=gnu99
 CFLAGS  += -g -m32
 BINDIR = $(ROOTDIR)/bin
 LIBDIR  = -L$(ROOTDIR)/lib
@@ -17,7 +17,7 @@ LIBS    = -lhardware -lreadline
 ###------------------------------------------------------------
 BINARIES= mkhd dmps frmt vm mkvol dvol mknfs dfs if_pfile if_nfile if_cfile if_dfile shell
 OBJECTS	= $(addsuffix .o,\
-	  drive mbr tools ifile mount inode superbloc dir file)
+	  drive mbr tools ifile mount inode superbloc dir file ctx hw)
 
 all: $(BINARIES) $(OBJECTS)
 
@@ -61,6 +61,8 @@ frmt.o: frmt.c
 vm.o: vm.c
 current.o: current.c 
 
+hw.o: hw.c hw.h
+ctx.o: ctx.c ctx.h hw.h
 drive.o: drive.c drive.h
 mbr.o: mbr.c drive.h mbr.h
 mkvol.o: mbr.c mbr.h drive.h
