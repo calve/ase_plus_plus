@@ -63,10 +63,13 @@ char* get_arguments(char* command_line){
 }
 
 
-/* Construct the canonical path of ``path`` and store it in ``target``
+/* Construct the canonical path of ``path`` and store it in ``canonical``
  * returns a canonical path that starts at ``/`` and should not contains ``.`` (dot) or ``..`` (double dot)
  */
-void canonical_path(char* target, char* path){
+void canonical_path(char* canonical, char* path){
+  char *token;
+  char target[MAXPROMPT] = "";
+  strcpy(canonical, target);
   if (*path != '/'){
     strcpy(target, cwd);
     strcat(target, path);
@@ -74,6 +77,33 @@ void canonical_path(char* target, char* path){
     strcpy(target, path);
   }
   verbose("canonical path : %s\n", target);
+
+  /* Parse target to find double-dot sequences */
+  token = strtok(target, "/");
+  while(token != NULL){
+    if (strncmp(token, "..", 2) == 0){ /* Go one level up */
+      char tmp[MAXPROMPT] = "";
+      int last_index;
+      strcpy(tmp, canonical);
+      last_index = strrchr(tmp, '/') - tmp;
+      canonical[0] = '\0';
+      if (strlen(tmp) == 1)
+        {
+          canonical = strncat(canonical, "/", 1);
+        }
+      else
+        {
+          strncat(canonical, tmp, last_index);
+        }
+    }
+    else if (strncmp(token, ".", 1) == 0){ /* Do nothing */ }
+    else { /* Concat this token to the target*/
+      strcat(canonical, "/");
+      strcat(canonical, token);
+    }
+    verbose("canonical path : %s\n", canonical);
+    token = strtok(NULL, "/");
+  }
 }
 
 
@@ -179,7 +209,7 @@ void do_cp(char* source, char* dest){
   int c;
   char target[MAXPROMPT];
   canonical_path(target, dest);
-  
+
   inumber = create_file(target, FILE_FILE);
   if (inumber == RETURN_FAILURE){
     printf("erreur creation fichier");
