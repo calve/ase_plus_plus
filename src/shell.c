@@ -251,7 +251,7 @@ void do_rm(char* arguments){
 
   status = delete_file(target);
   if (status == RETURN_FAILURE){
-    printf("Error removing %s", target);
+    printf("Error removing %s\n", target);
   }
 }
 
