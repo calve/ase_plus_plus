@@ -30,6 +30,8 @@ Lancer les commandes suivantes pour créer un disque virtuel, et initialiser un 
     ./bin/mkvol --cylinder 1 --sector 1 --size 16000 --type base
     ./bin/mknfs --volume 0 --serial 4242 --name thenameisbill
 
+Vous pouvez aussi éxécuter ``make volume``
+
 ## Utilisation du shell
 
 Exemple d'utilisation du shell ``./bin/shell``

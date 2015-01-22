@@ -13,6 +13,22 @@ realclean:
 	rm -rf ./bin
 	make -C $(SRCDIR) realclean
 
+volume: bin-dir
+	rm vdiskA.bin
+	@echo ""
+	@echo "Creating virtual hard drive"
+	@echo ""
+	$(BINDIR)/mkhd
+	@echo ""
+	@echo "Creating volumes"
+	@echo ""
+	$(BINDIR)/mkvol --cylinder 1 --sector 1 --size 16000 --type base > /dev/null
+	$(BINDIR)/dvol
+	@echo ""
+	@echo "Create a filesystem on current_volume"
+	@echo ""
+	$(BINDIR)/mknfs --volume 0 --serial 424242 --name TestVolume
+
 test: export CURRENT_VOLUME = 1
 test: $(BINDIR)/dvol $(BINDIR)/mkvol
 	rm vdiskA.bin
