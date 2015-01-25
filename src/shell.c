@@ -104,6 +104,9 @@ void canonical_path(char* canonical, char* path){
     verbose("canonical path : %s\n", canonical);
     token = strtok(NULL, "/");
   }
+  if (strlen(canonical) == 0){ /* Ensure canonical path is not empty */
+    strncat(canonical, "/", 1);
+  }
 }
 
 
