@@ -199,7 +199,7 @@ unsigned int vbloc_of_fbloc(unsigned int inumber, unsigned int fbloc, bool_t do_
 		return indirect[indirect_index]; 		
 	}
 	
-	fprintf(stderr,"fbloc is too big.\n\tfbloc provided: %d\n\tfbloc max size: %d",fbloc, NB_DIRECTS+NB_BLOCS_BY_BLOC+NB_BLOCS_BY_BLOC*NB_BLOCS_BY_BLOC);
+	fprintf(stderr,"fbloc is too big.\n\tfbloc provided: %d\n\tfbloc max size: %d\n",fbloc, NB_DIRECTS+NB_BLOCS_BY_BLOC+NB_BLOCS_BY_BLOC*NB_BLOCS_BY_BLOC);
 	return -1;
 }
 
