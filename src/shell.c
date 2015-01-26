@@ -56,10 +56,33 @@ int is_command(char* command_line, char* command){
  */
 char* get_arguments(char* command_line){
   char* index = strchr(command_line, ' ');
-  if (index)
+  if (index){
     return index+1;
+  }
   else
     return "";
+}
+
+/* Returns true if the command is in background
+ */
+int is_background(char* command_line){
+  char* index = strchr(command_line, '&');
+  if (index)
+    return 1;
+  else
+    return 0;
+}
+
+/* Returns the first argument in the command_line
+  */
+char* get_first_argument(char* command_line){
+  char arg[42];
+  int i=0;
+  while(command_line[i] != ' '){
+    i++;
+  }
+  strncpy(arg, command_line, i);
+  return arg;
 }
 
 
@@ -124,6 +147,7 @@ void do_help(){
   printf("  rm path\n");
   printf("  rmdir path\n");
   printf("  cp source target\n");
+  printf("  exit       -- to exit the shell\n");
 }
 
 
@@ -288,11 +312,15 @@ void do_rm(char* arguments){
   }
 }
 
+void do_exit(){
+  exit(EXIT_SUCCESS);
+}
+
 
 /* Evaluate a command runned inside the shell
  */
 int eval(char *cmd){
-  char *arg1;
+  char *destination, *source;
   char *arguments = get_arguments(cmd);
   if(!is_command(cmd, "cat")){
     do_cat(arguments);
@@ -307,8 +335,9 @@ int eval(char *cmd){
     return 0;
   }
   if(!is_command(cmd, "cp")){
-    arg1 = get_arguments(arguments);
-    do_cp(arg1, arguments);
+    source = get_first_argument(arguments);
+    destination = get_arguments(arguments);
+    do_cp(source, destination);
     return 0;
   }
   if(!is_command(cmd, "help")){
@@ -329,6 +358,10 @@ int eval(char *cmd){
   }
   if(!is_command(cmd, "rm")){
     do_rm(arguments);
+    return 0;
+  }
+  if(!is_command(cmd, "exit")){
+    do_exit();
     return 0;
   }
   printf("Unknow command\n");
