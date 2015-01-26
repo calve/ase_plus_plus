@@ -329,16 +329,15 @@ void do_rm(char* arguments){
 int eval(char *cmd){
   char *destination, *source;
   char *arguments = get_arguments(cmd);
-  struct ctx_s *context;
+
   if(!is_command(cmd, "cat")){
     do_cat(arguments);
-    return 0;
   }
-  else  if(!is_command(cmd, "cd")){
-    context = create_ctx(16000, (void*) do_cd, (void*) arguments);
+  else if(!is_command(cmd, "cd")){
+    do_cd(arguments);
   }
   else if(!is_command(cmd, "ed")){
-    context = create_ctx(16000, (void*) do_ed, (void*) arguments);
+    do_ed(arguments);
   }
   else if(!is_command(cmd, "cp")){
     source = get_first_argument(arguments);
@@ -346,22 +345,22 @@ int eval(char *cmd){
     do_cp(source, destination);
   }
   else if(!is_command(cmd, "help")){
-    context = create_ctx(16000, do_help, (void*) arguments);
+    do_help();
   }
   else if(!is_command(cmd, "ls")){
-    context = create_ctx(16000, (void*) do_ls, (void*) arguments);
+    do_ls(arguments);
   }
   else if(!is_command(cmd, "mkdir")){
-    context = create_ctx(16000, (void*) do_mkdir, (void*) arguments);
+    do_mkdir(arguments);
   }
   else if(!is_command(cmd, "mount")){
-    context = create_ctx(16000, (void*) do_mount, (void*) arguments);
+    do_mount(arguments);
   }
   else if(!is_command(cmd, "rm")){
-    context = create_ctx(16000, (void*) do_rm, (void*) arguments);
+    do_rm(arguments);
   }
   else if(!is_command(cmd, "exit")){
-    context = create_ctx(16000, (void*) do_exit, (void*) arguments);
+    do_exit();
   }
   else{
     printf("Unknow command\n");
@@ -391,8 +390,18 @@ void shell_loop(void* arguments) {
     /* Evaluate the command line */
     if (cmdline[0] != '\0') /* evaluate the command line only it is not empty */
       {
-        add_history(cmdline);
-        eval(cmdline);
+        /* Copy the command line so it is not freed to soon */
+        char cmdline_cpy[MAXPROMPT] = "";
+        strcpy(cmdline_cpy, cmdline);
+
+        add_history(cmdline_cpy);
+        if (is_background(cmdline_cpy)){
+          verbose("Will run ``%s`` in a new context\n", cmdline_cpy + 1);
+          create_ctx(16000, (void*) eval, cmdline_cpy + 1);
+        }
+        else {
+          eval(cmdline_cpy);
+        }
         fflush(stdout);
         fflush(stdin);
       }
