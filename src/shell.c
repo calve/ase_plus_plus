@@ -139,15 +139,15 @@ void do_help(){
   printf("List of built-in commands :\n");
   printf("  cat path\n");
   printf("  cd absolute_path\n");
+  printf("  cp source target\n");
   printf("  ed path (the EDitor)\n");
+  printf("  exit       -- to exit the shell\n");
   printf("  help\n");
   printf("  ls [path]\n");
   printf("  mount volume\n");
   printf("  mkdir path\n");
   printf("  rm path\n");
   printf("  rmdir path\n");
-  printf("  cp source target\n");
-  printf("  exit       -- to exit the shell\n");
 }
 
 
