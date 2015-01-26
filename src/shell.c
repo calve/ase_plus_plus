@@ -335,23 +335,9 @@ int eval(char *cmd){
   return 1;
 }
 
-
-int main(int argc, char** argv){
-  /* Initialize history */
-  using_history();
-
-  if (argc > 1 && strcmp(argv[1], "-v") == 0){
-    is_verbose = 1;
-    printf("Set verbose flag\n");
-  } else {
-    printf("Verbose flag not set. Use -v if you want to\n");
   }
 
-  printf("Welcome in shell. Build date %s %s\n", __DATE__, __TIME__);
-  printf("Type ``help`` to find out all the available commands in this shell\n");
-  mount_volume(0);
-  printf("Volume 0 has been automatically mounted. Use ``mount`` to mount another\n");
-  printf("\n");
+void shell_loop(void* arguments) {
   /* Execute the shell's read/eval loop */
   while (1) {
     char prompt[MAXPROMPT];
@@ -379,6 +365,31 @@ int main(int argc, char** argv){
 
     free(cmdline); /* Has been allocated by readline */
   }
+}
+
+int main(int argc, char** argv){
+  /* Initialize history */
+  using_history();
+
+  if (argc > 1 && strcmp(argv[1], "-v") == 0){
+    is_verbose = 1;
+    printf("Set verbose flag\n");
+  } else {
+    printf("Verbose flag not set. Use -v if you want to\n");
+  }
+
+  printf("Welcome in shell. Build date %s %s\n", __DATE__, __TIME__);
+  printf("Type ``help`` to find out all the available commands in this shell\n");
+  mount_volume(0);
+  printf("Volume 0 has been automatically mounted. Use ``mount`` to mount another\n");
+  IRQVECTOR[TIMER_IRQ] = timer_it;
+  _out(TIMER_PARAM,128+64); /* reset + alarm on + 8 tick / alarm */
+  _out(TIMER_ALARM,0xFFFFFFFD);  /* alarm at next tick (at 0xFFFFFFFF) */
+  printf("Binded timer interruptions\n");
+  printf("\n");
+
+  create_ctx(16000, shell_loop, NULL);
+  start_sched();
   umount();
   fflush(stdout);
   exit(EXIT_SUCCESS);
