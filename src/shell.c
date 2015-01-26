@@ -7,10 +7,13 @@
 #include <readline/history.h>
 #include <string.h>
 
+#include "../include/hardware.h"
+#include "hardware_ini.h"
 #include "file.h"
 #include "dir.h"
 #include "mount.h"
 #include "inode.h"              /* Needed for file_type_e */
+#include "ctx.h"
 
 #define MAXPROMPT 256
 
@@ -38,6 +41,13 @@ int construct_prompt(char* string, int string_size)
   strcat(res,shellsymbol);
   strcpy(string,res);
   return 0;
+}
+
+
+static void
+timer_it() {
+  _out(TIMER_ALARM, 0xFFFFFFFE);
+  yield();
 }
 
 
@@ -294,48 +304,42 @@ void do_rm(char* arguments){
 int eval(char *cmd){
   char *arg1;
   char *arguments = get_arguments(cmd);
+  struct ctx_s *context;
   if(!is_command(cmd, "cat")){
     do_cat(arguments);
     return 0;
   }
-  if(!is_command(cmd, "cd")){
-    do_cd(arguments);
-    return 0;
+  else  if(!is_command(cmd, "cd")){
+    context = create_ctx(16000, (void*) do_cd, (void*) arguments);
   }
-  if(!is_command(cmd, "ed")){
-    do_ed(arguments);
-    return 0;
+  else if(!is_command(cmd, "ed")){
+    context = create_ctx(16000, (void*) do_ed, (void*) arguments);
   }
-  if(!is_command(cmd, "cp")){
+  else if(!is_command(cmd, "cp")){
     arg1 = get_arguments(arguments);
     do_cp(arg1, arguments);
-    return 0;
   }
-  if(!is_command(cmd, "help")){
-    do_help();
-    return 0;
+  else if(!is_command(cmd, "help")){
+    context = create_ctx(16000, do_help, (void*) arguments);
   }
-  if(!is_command(cmd, "ls")){
-    do_ls(arguments);
-    return 0;
+  else if(!is_command(cmd, "ls")){
+    context = create_ctx(16000, (void*) do_ls, (void*) arguments);
   }
-  if(!is_command(cmd, "mkdir")){
-    do_mkdir(arguments);
-    return 0;
+  else if(!is_command(cmd, "mkdir")){
+    context = create_ctx(16000, (void*) do_mkdir, (void*) arguments);
   }
-  if(!is_command(cmd, "mount")){
-    do_mount(arguments);
-    return 0;
+  else if(!is_command(cmd, "mount")){
+    context = create_ctx(16000, (void*) do_mount, (void*) arguments);
   }
-  if(!is_command(cmd, "rm")){
-    do_rm(arguments);
-    return 0;
+  else if(!is_command(cmd, "rm")){
+    context = create_ctx(16000, (void*) do_rm, (void*) arguments);
   }
-  printf("Unknow command\n");
-  return 1;
+  else{
+    printf("Unknow command\n");
+    return 1;
+  }
+  return 0;
 }
-
-  }
 
 void shell_loop(void* arguments) {
   /* Execute the shell's read/eval loop */

@@ -4,7 +4,7 @@
 ROOTDIR=../
 
 CC	= gcc
-CFLAGS	= -Wall -pedantic
+CFLAGS	= -Wall -ansi
 CFLAGS  +=  -std=gnu99
 CFLAGS  += -g -m32
 BINDIR = $(ROOTDIR)/bin
