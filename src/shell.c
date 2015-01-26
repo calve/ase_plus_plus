@@ -148,15 +148,15 @@ void do_help(){
   printf("List of built-in commands :\n");
   printf("  cat path\n");
   printf("  cd absolute_path\n");
+  printf("  cp source target\n");
   printf("  ed path (the EDitor)\n");
+  printf("  exit       -- to exit the shell\n");
   printf("  help\n");
   printf("  ls [path]\n");
-  printf("  mount volume\n");
   printf("  mkdir path\n");
+  printf("  mount volume\n");
   printf("  rm path\n");
   printf("  rmdir path\n");
-  printf("  cp source target\n");
-  printf("  exit       -- to exit the shell\n");
 }
 
 
@@ -207,37 +207,6 @@ void do_cd(char* arguments){
 }
 
 
-/* ed is the standard editor */
-void do_ed(char* arguments){
-  file_desc_t fd;
-  unsigned int inumber;
-  int status;
-  int c;
-  char target[MAXPROMPT];
-  canonical_path(target, arguments);
-
-  printf("please wait ...");
-  fflush(stdout);
-  inumber = create_file(target, FILE_FILE);
-  if (inumber == RETURN_FAILURE ){
-    printf("erreur creation fichier");
-    printf("%u\n", inumber);
-    return;
-  }
-  status = open_ifile(&fd, inumber);
-  if (status != RETURN_SUCCESS){
-    printf("erreur ouverture fichier %d", inumber);
-    return;
-  }
-  printf(" file opened, you can now enter your text\n");
-  while((c=getchar()) != EOF)
-    {
-      writec_ifile(&fd, c);
-    }
-  close_file(&fd);
-  printf("\n");
-}
-
 void do_cp(char* source, char* dest){
   file_desc_t sfd, dfd;
   unsigned int inumber;
@@ -271,6 +240,42 @@ void do_cp(char* source, char* dest){
   close_file(&sfd);
 }
 
+
+/* ed is the standard editor */
+void do_ed(char* arguments){
+  file_desc_t fd;
+  unsigned int inumber;
+  int status;
+  int c;
+  char target[MAXPROMPT];
+  canonical_path(target, arguments);
+
+  printf("please wait ...");
+  fflush(stdout);
+  inumber = create_file(target, FILE_FILE);
+  if (inumber == RETURN_FAILURE ){
+    printf("erreur creation fichier");
+    printf("%u\n", inumber);
+    return;
+  }
+  status = open_ifile(&fd, inumber);
+  if (status != RETURN_SUCCESS){
+    printf("erreur ouverture fichier %d", inumber);
+    return;
+  }
+  printf(" file opened, you can now enter your text\n");
+  while((c=getchar()) != EOF)
+    {
+      writec_ifile(&fd, c);
+    }
+  close_file(&fd);
+  printf("\n");
+}
+
+void do_exit(){
+  exit(EXIT_SUCCESS);
+}
+
 /* Print the current working directory only for the moment */
 void do_ls(char* arguments){
   file_desc_t current;
@@ -290,7 +295,6 @@ void do_ls(char* arguments){
   close_file(&current);
 }
 
-
 void do_mkdir(char* arguments){
   int status;
   char target[MAXPROMPT];
@@ -302,13 +306,11 @@ void do_mkdir(char* arguments){
   }
 }
 
-
 void do_mount(char* arguments){
   int volume;
   sscanf(arguments, "%i", &volume);
   mount_volume(volume);
 }
-
 
 void do_rm(char* arguments){
   int status;
@@ -319,10 +321,6 @@ void do_rm(char* arguments){
   if (status == RETURN_FAILURE){
     printf("Error removing %s\n", target);
   }
-}
-
-void do_exit(){
-  exit(EXIT_SUCCESS);
 }
 
 
