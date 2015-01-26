@@ -66,12 +66,34 @@ int is_command(char* command_line, char* command){
  */
 char* get_arguments(char* command_line){
   char* index = strchr(command_line, ' ');
-  if (index)
+  if (index){
     return index+1;
+  }
   else
     return "";
 }
 
+/* Returns true if the command is in background
+ */
+int is_background(char* command_line){
+  char* index = strchr(command_line, '&');
+  if (index)
+    return 1;
+  else
+    return 0;
+}
+
+/* Returns the first argument in the command_line
+  */
+char* get_first_argument(char* command_line){
+  char arg[42];
+  int i=0;
+  while(command_line[i] != ' '){
+    i++;
+  }
+  strncpy(arg, command_line, i);
+  return arg;
+}
 
 /* Construct the canonical path of ``path`` and store it in ``canonical``
  * returns a canonical path that starts at ``/`` and should not contains ``.`` (dot) or ``..`` (double dot)
@@ -134,6 +156,7 @@ void do_help(){
   printf("  rm path\n");
   printf("  rmdir path\n");
   printf("  cp source target\n");
+  printf("  exit       -- to exit the shell\n");
 }
 
 
@@ -298,11 +321,15 @@ void do_rm(char* arguments){
   }
 }
 
+void do_exit(){
+  exit(EXIT_SUCCESS);
+}
+
 
 /* Evaluate a command runned inside the shell
  */
 int eval(char *cmd){
-  char *arg1;
+  char *destination, *source;
   char *arguments = get_arguments(cmd);
   struct ctx_s *context;
   if(!is_command(cmd, "cat")){
@@ -316,8 +343,9 @@ int eval(char *cmd){
     context = create_ctx(16000, (void*) do_ed, (void*) arguments);
   }
   else if(!is_command(cmd, "cp")){
-    arg1 = get_arguments(arguments);
-    do_cp(arg1, arguments);
+    source = get_first_argument(arguments);
+    destination = get_arguments(arguments);
+    do_cp(source, destination);
   }
   else if(!is_command(cmd, "help")){
     context = create_ctx(16000, do_help, (void*) arguments);
@@ -334,12 +362,16 @@ int eval(char *cmd){
   else if(!is_command(cmd, "rm")){
     context = create_ctx(16000, (void*) do_rm, (void*) arguments);
   }
+  else if(!is_command(cmd, "exit")){
+    context = create_ctx(16000, (void*) do_exit, (void*) arguments);
+  }
   else{
     printf("Unknow command\n");
     return 1;
   }
   return 0;
 }
+
 
 void shell_loop(void* arguments) {
   /* Execute the shell's read/eval loop */
