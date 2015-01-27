@@ -7,10 +7,13 @@
 #include <readline/history.h>
 #include <string.h>
 
+#include "../include/hardware.h"
+#include "hardware_ini.h"
 #include "file.h"
 #include "dir.h"
 #include "mount.h"
 #include "inode.h"              /* Needed for file_type_e */
+#include "ctx.h"
 
 #define MAXPROMPT 256
 
@@ -38,6 +41,13 @@ int construct_prompt(char* string, int string_size)
   strcat(res,shellsymbol);
   strcpy(string,res);
   return 0;
+}
+
+
+static void
+timer_it() {
+  _out(TIMER_ALARM, 0xFFFFFFFE);
+  yield();
 }
 
 
@@ -72,19 +82,6 @@ int is_background(char* command_line){
   else
     return 0;
 }
-
-/* Returns the first argument in the command_line
-  */
-char* get_first_argument(char* command_line){
-  char arg[42];
-  int i=0;
-  while(command_line[i] != ' '){
-    i++;
-  }
-  strncpy(arg, command_line, i);
-  return arg;
-}
-
 
 /* Construct the canonical path of ``path`` and store it in ``canonical``
  * returns a canonical path that starts at ``/`` and should not contains ``.`` (dot) or ``..`` (double dot)
@@ -139,13 +136,14 @@ void do_help(){
   printf("List of built-in commands :\n");
   printf("  cat path\n");
   printf("  cd absolute_path\n");
+  printf("  compute integer\n");
   printf("  cp source target\n");
   printf("  ed path (the EDitor)\n");
   printf("  exit       -- to exit the shell\n");
   printf("  help\n");
   printf("  ls [path]\n");
-  printf("  mount volume\n");
   printf("  mkdir path\n");
+  printf("  mount volume\n");
   printf("  rm path\n");
   printf("  rmdir path\n");
 }
@@ -197,6 +195,65 @@ void do_cd(char* arguments){
   }
 }
 
+/* A function that do heavy computing used to test contexts */
+void do_compute(char* arguments){
+  int res = 0;
+  int max;
+  max = atoi(arguments);
+  for (int i = 0; i<max; i++){
+    for (int j = i; j<max; j++){
+      res += j;
+    }
+  }
+  printf("finished computing, result %i\n", res);
+}
+
+void do_cp(char* arguments){
+  file_desc_t sfd, dfd;
+  unsigned int inumber;
+  int status;
+  int c;
+  char source[MAXPROMPT];
+  char dest[MAXPROMPT];
+
+  char canonical_source[MAXPROMPT]="";
+  char canonical_dest[MAXPROMPT]="";
+
+  status = sscanf(arguments, "%s %s", source, dest);
+  if (status != 2 && status == EOF){
+    printf("Error while parsing command line : ``cp %s``\n", arguments);
+    return;
+  }
+  canonical_path(canonical_source, source);
+  canonical_path(canonical_dest, dest);
+
+  verbose("cp %s %s\n", canonical_source, canonical_dest);
+
+  inumber = create_file(canonical_dest, FILE_FILE);
+  if (inumber == RETURN_FAILURE){
+    printf("erreur creation fichier");
+    printf("%u\n", inumber);
+    return;
+  }
+
+  status = open_ifile(&dfd, inumber);
+  if (status != RETURN_SUCCESS){
+    printf("erreur ouverture fichier %d", inumber);
+    return;
+  }
+
+  status = open_file(&sfd, canonical_source);
+  if (status != RETURN_SUCCESS){
+    printf("cannot open %s\n", source);
+    return;
+  }
+
+  while((c=readc_file(&sfd)) != READ_EOF)
+    writec_file(&dfd, c);
+  close_file(&dfd);
+  close_file(&sfd);
+}
+
 
 /* ed is the standard editor */
 void do_ed(char* arguments){
@@ -229,37 +286,8 @@ void do_ed(char* arguments){
   printf("\n");
 }
 
-void do_cp(char* source, char* dest){
-  file_desc_t sfd, dfd;
-  unsigned int inumber;
-  int status;
-  int c;
-  char target[MAXPROMPT];
-  canonical_path(target, dest);
-
-  inumber = create_file(target, FILE_FILE);
-  if (inumber == RETURN_FAILURE){
-    printf("erreur creation fichier");
-    printf("%u\n", inumber);
-    return;
-  }
-
-  status = open_ifile(&dfd, inumber);
-  if (status != RETURN_SUCCESS){
-    printf("erreur ouverture fichier %d", inumber);
-    return;
-  }
-  canonical_path(target, source);
-  status = open_file(&sfd, target);
-  if (status != RETURN_SUCCESS){
-    printf("cannot open %s\n", target);
-    return;
-  }
-
-  while((c=readc_file(&sfd)) != READ_EOF)
-    writec_file(&dfd, c);
-  close_file(&dfd);
-  close_file(&sfd);
+void do_exit(){
+  exit(EXIT_SUCCESS);
 }
 
 /* Print the current working directory only for the moment */
@@ -281,7 +309,6 @@ void do_ls(char* arguments){
   close_file(&current);
 }
 
-
 void do_mkdir(char* arguments){
   int status;
   char target[MAXPROMPT];
@@ -293,13 +320,11 @@ void do_mkdir(char* arguments){
   }
 }
 
-
 void do_mount(char* arguments){
   int volume;
   sscanf(arguments, "%i", &volume);
   mount_volume(volume);
 }
-
 
 void do_rm(char* arguments){
   int status;
@@ -312,79 +337,54 @@ void do_rm(char* arguments){
   }
 }
 
-void do_exit(){
-  exit(EXIT_SUCCESS);
-}
-
 
 /* Evaluate a command runned inside the shell
  */
 int eval(char *cmd){
-  char *destination, *source;
   char *arguments = get_arguments(cmd);
+
   if(!is_command(cmd, "cat")){
     do_cat(arguments);
-    return 0;
   }
-  if(!is_command(cmd, "cd")){
+  else if(!is_command(cmd, "cd")){
     do_cd(arguments);
-    return 0;
   }
-  if(!is_command(cmd, "ed")){
+  else if(!is_command(cmd, "compute")){
+    do_compute(arguments);
+  }
+  else if(!is_command(cmd, "cp")){
+    do_cp(arguments);
+  }
+  else if(!is_command(cmd, "ed")){
     do_ed(arguments);
-    return 0;
   }
-  if(!is_command(cmd, "cp")){
-    source = get_first_argument(arguments);
-    destination = get_arguments(arguments);
-    do_cp(source, destination);
-    return 0;
-  }
-  if(!is_command(cmd, "help")){
+  else if(!is_command(cmd, "help")){
     do_help();
-    return 0;
   }
-  if(!is_command(cmd, "ls")){
+  else if(!is_command(cmd, "ls")){
     do_ls(arguments);
-    return 0;
   }
-  if(!is_command(cmd, "mkdir")){
+  else if(!is_command(cmd, "mkdir")){
     do_mkdir(arguments);
-    return 0;
   }
-  if(!is_command(cmd, "mount")){
+  else if(!is_command(cmd, "mount")){
     do_mount(arguments);
-    return 0;
   }
-  if(!is_command(cmd, "rm")){
+  else if(!is_command(cmd, "rm")){
     do_rm(arguments);
-    return 0;
   }
-  if(!is_command(cmd, "exit")){
+  else if(!is_command(cmd, "exit")){
     do_exit();
-    return 0;
   }
-  printf("Unknow command\n");
-  return 1;
+  else{
+    printf("Unknow command\n");
+    return 1;
+  }
+  return 0;
 }
 
 
-int main(int argc, char** argv){
-  /* Initialize history */
-  using_history();
-
-  if (argc > 1 && strcmp(argv[1], "-v") == 0){
-    is_verbose = 1;
-    printf("Set verbose flag\n");
-  } else {
-    printf("Verbose flag not set. Use -v if you want to\n");
-  }
-
-  printf("Welcome in shell. Build date %s %s\n", __DATE__, __TIME__);
-  printf("Type ``help`` to find out all the available commands in this shell\n");
-  mount_volume(0);
-  printf("Volume 0 has been automatically mounted. Use ``mount`` to mount another\n");
-  printf("\n");
+void shell_loop(void* arguments) {
   /* Execute the shell's read/eval loop */
   while (1) {
     char prompt[MAXPROMPT];
@@ -404,14 +404,50 @@ int main(int argc, char** argv){
     /* Evaluate the command line */
     if (cmdline[0] != '\0') /* evaluate the command line only it is not empty */
       {
-        add_history(cmdline);
-        eval(cmdline);
+        /* Copy the command line so it is not freed to soon */
+        char cmdline_cpy[MAXPROMPT] = "";
+        strcpy(cmdline_cpy, cmdline);
+
+        add_history(cmdline_cpy);
+        if (is_background(cmdline_cpy)){
+          verbose("Will run ``%s`` in a new context\n", cmdline_cpy + 1);
+          create_ctx(16000, (void*) eval, cmdline_cpy + 1);
+        }
+        else {
+          eval(cmdline_cpy);
+        }
         fflush(stdout);
         fflush(stdin);
       }
 
     free(cmdline); /* Has been allocated by readline */
   }
+}
+
+int main(int argc, char** argv){
+  /* Initialize history */
+  using_history();
+
+  if (argc > 1 && strcmp(argv[1], "-v") == 0){
+    is_verbose = 1;
+    printf("Set verbose flag\n");
+  } else {
+    printf("Verbose flag not set. Use -v if you want to\n");
+  }
+
+  printf("Welcome in shell. Build date %s %s\n", __DATE__, __TIME__);
+  printf("Type ``help`` to find out all the available commands in this shell\n");
+  mount_volume(0);
+  printf("Volume 0 has been automatically mounted. Use ``mount`` to mount another\n");
+  IRQVECTOR[TIMER_IRQ] = timer_it;
+  _out(TIMER_PARAM,128+64); /* reset + alarm on + 8 tick / alarm */
+  _out(TIMER_ALARM,0xFFFFFFFD);  /* alarm at next tick (at 0xFFFFFFFF) */
+  printf("Binded timer interruptions\n");
+  printf("Add ``&`` in front of a command to run it in a new context (in background)\n");
+  printf("\n");
+
+  create_ctx(16000, shell_loop, NULL);
+  start_sched();
   umount();
   fflush(stdout);
   exit(EXIT_SUCCESS);

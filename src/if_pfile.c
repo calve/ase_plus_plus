@@ -41,7 +41,6 @@ usage(const char *prgm)
 int
 main (int argc, char *argv[])
 {
-    unsigned inumber;
     if (argc < 2)
         usage(argv[0]);
     printf("%s\n", argv[1]);
