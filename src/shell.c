@@ -220,15 +220,28 @@ void do_compute(char* arguments){
   printf("finished computing, result %i\n", res);
 }
 
-void do_cp(char* source, char* dest){
+void do_cp(char* arguments){
   file_desc_t sfd, dfd;
   unsigned int inumber;
   int status;
   int c;
-  char target[MAXPROMPT];
-  canonical_path(target, dest);
+  char source[MAXPROMPT];
+  char dest[MAXPROMPT];
 
-  inumber = create_file(target, FILE_FILE);
+  char canonical_source[MAXPROMPT]="";
+  char canonical_dest[MAXPROMPT]="";
+
+  status = sscanf(arguments, "%s %s", source, dest);
+  if (status != 2 && status == EOF){
+    printf("Error while parsing command line : ``cp %s``\n", arguments);
+    return;
+  }
+  canonical_path(canonical_source, source);
+  canonical_path(canonical_dest, dest);
+
+  verbose("cp %s %s\n", canonical_source, canonical_dest);
+
+  inumber = create_file(canonical_dest, FILE_FILE);
   if (inumber == RETURN_FAILURE){
     printf("erreur creation fichier");
     printf("%u\n", inumber);
@@ -240,10 +253,10 @@ void do_cp(char* source, char* dest){
     printf("erreur ouverture fichier %d", inumber);
     return;
   }
-  canonical_path(target, source);
-  status = open_file(&sfd, target);
+
+  status = open_file(&sfd, canonical_source);
   if (status != RETURN_SUCCESS){
-    printf("cannot open %s\n", target);
+    printf("cannot open %s\n", source);
     return;
   }
 
@@ -340,7 +353,6 @@ void do_rm(char* arguments){
 /* Evaluate a command runned inside the shell
  */
 int eval(char *cmd){
-  char *destination, *source;
   char *arguments = get_arguments(cmd);
 
   if(!is_command(cmd, "cat")){
@@ -353,9 +365,7 @@ int eval(char *cmd){
     do_compute(arguments);
   }
   else if(!is_command(cmd, "cp")){
-    source = get_first_argument(arguments);
-    destination = get_arguments(arguments);
-    do_cp(source, destination);
+    do_cp(arguments);
   }
   else if(!is_command(cmd, "ed")){
     do_ed(arguments);
