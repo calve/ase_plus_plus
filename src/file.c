@@ -38,7 +38,8 @@ create_file(const char *pathname, enum file_type_e type)
 
     /*  link the file in his directory */
     status = add_entry(idir, inumber, basename);
-
+    if (status != RETURN_SUCCESS)
+      return RETURN_FAILURE;
     return inumber;
 }
 

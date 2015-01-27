@@ -48,6 +48,7 @@ static void load_this_volume (int volume)
 
     current_volume = volume;
     status = load_super(current_volume);
+    ffatal(!status, "unable to load super of vol %d", current_volume);
 }
 
 /* return hw_config filename */
