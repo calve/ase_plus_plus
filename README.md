@@ -39,7 +39,9 @@ Exemple d'utilisation du shell ``./bin/shell``
     Welcome in shell. Build date Jan 20 2015 16:09:59
     Type ``help`` to find out all the available commands in this shell
     Volume 0 has been automatically mounted. Use ``mount`` to mount another
-    
+    Binded timer interruptions
+    Add ``&`` in front of a command to run it in a new context (in background)
+
     />help
     List of built-in commands :
     cat path
@@ -58,16 +60,21 @@ Exemple d'utilisation du shell ``./bin/shell``
     ceci est le contenu de mon fichier
     avec une
     nouvelle ligne. Je termine l'entrée avec un retour à la ligne puis EOF (^D)
-    
+
     /bepo/>cat fichier
     ceci est le contenu de mon fichier
     avec une
     nouvelle ligne. Je termine l'entrée avec un retour à la ligne puis EOF (^D)
-    
+
     /bepo/>rm fichier
     /bepo/>cat fichier
     Cannot open /bepo/fichier
-    /bepo/>
+    /bepo/>compute 5000
+    finished computing, result 1188911504
+    /bepo/>&compute 50000
+    /bepo/>ls
+
+    /bepo/>finished computing, result 118891150
 
 # Test
 
@@ -90,4 +97,3 @@ Exemple d'utilisation du shell ``./bin/shell``
 voir sceance2.md
 
 # BUGS
-

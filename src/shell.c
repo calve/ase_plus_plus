@@ -445,6 +445,7 @@ int main(int argc, char** argv){
   _out(TIMER_PARAM,128+64); /* reset + alarm on + 8 tick / alarm */
   _out(TIMER_ALARM,0xFFFFFFFD);  /* alarm at next tick (at 0xFFFFFFFF) */
   printf("Binded timer interruptions\n");
+  printf("Add ``&`` in front of a command to run it in a new context (in background)\n");
   printf("\n");
 
   create_ctx(16000, shell_loop, NULL);
