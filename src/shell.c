@@ -83,18 +83,6 @@ int is_background(char* command_line){
     return 0;
 }
 
-/* Returns the first argument in the command_line
-  */
-char* get_first_argument(char* command_line){
-  char arg[42];
-  int i=0;
-  while(command_line[i] != ' '){
-    i++;
-  }
-  strncpy(arg, command_line, i);
-  return arg;
-}
-
 /* Construct the canonical path of ``path`` and store it in ``canonical``
  * returns a canonical path that starts at ``/`` and should not contains ``.`` (dot) or ``..`` (double dot)
  */
