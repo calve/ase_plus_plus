@@ -149,6 +149,7 @@ void do_help(){
   printf("  cat path\n");
   printf("  cd absolute_path\n");
   printf("  cp source target\n");
+  printf("  compute integer\n");
   printf("  ed path (the EDitor)\n");
   printf("  exit       -- to exit the shell\n");
   printf("  help\n");
@@ -206,6 +207,18 @@ void do_cd(char* arguments){
   }
 }
 
+/* A function that do heavy computing used to test contexts */
+void do_compute(char* arguments){
+  int res = 0;
+  int max;
+  max = atoi(arguments);
+  for (int i = 0; i<max; i++){
+    for (int j = i; j<max; j++){
+      res += j;
+    }
+  }
+  printf("finished computing, result %i\n", res);
+}
 
 void do_cp(char* source, char* dest){
   file_desc_t sfd, dfd;
@@ -336,13 +349,16 @@ int eval(char *cmd){
   else if(!is_command(cmd, "cd")){
     do_cd(arguments);
   }
-  else if(!is_command(cmd, "ed")){
-    do_ed(arguments);
+  else if(!is_command(cmd, "compute")){
+    do_compute(arguments);
   }
   else if(!is_command(cmd, "cp")){
     source = get_first_argument(arguments);
     destination = get_arguments(arguments);
     do_cp(source, destination);
+  }
+  else if(!is_command(cmd, "ed")){
+    do_ed(arguments);
   }
   else if(!is_command(cmd, "help")){
     do_help();
