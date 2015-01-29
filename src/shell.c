@@ -240,14 +240,14 @@ void do_cp(char* arguments){
     printf("Error while parsing command line : ``cp %s``\n", arguments);
     return;
   }
-
-  if (exists(dest)){
-    printf("Impossible to copy the file with this name. Please try an other one.\n");
-    return;
-  }
   
   canonical_path(canonical_source, source);
   canonical_path(canonical_dest, dest);
+
+  if (exists(canonical_dest)){
+    printf("Impossible to copy the file with this name. Please try an other one.\n");
+    return;
+  }
 
   verbose("cp %s %s\n", canonical_source, canonical_dest);
 
@@ -286,7 +286,7 @@ void do_ed(char* arguments){
   char target[MAXPROMPT];
   canonical_path(target, arguments);
 
-  if (exists(arguments)){
+  if (exists(target)){
     printf("Impossible to create a file with this name. Please try an other one.\n");
     return;
   }
