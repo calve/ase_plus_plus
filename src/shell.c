@@ -136,8 +136,8 @@ void do_help(){
   printf("List of built-in commands :\n");
   printf("  cat path\n");
   printf("  cd absolute_path\n");
-  printf("  cp source target\n");
   printf("  compute integer\n");
+  printf("  cp source target\n");
   printf("  ed path (the EDitor)\n");
   printf("  exit       -- to exit the shell\n");
   printf("  help\n");
