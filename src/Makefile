@@ -17,7 +17,7 @@ LIBS    = -lhardware -lreadline
 ###------------------------------------------------------------
 BINARIES= mkhd dmps frmt vm mkvol dvol mknfs dfs if_pfile if_nfile if_cfile if_dfile shell
 OBJECTS	= $(addsuffix .o,\
-	  drive mbr tools ifile mount inode superbloc dir file ctx hw)
+	  ctx hw drive mbr tools ifile mount inode superbloc dir file commons builtins)
 
 all: $(BINARIES) $(OBJECTS)
 
@@ -71,17 +71,19 @@ mknfs.o: mbr.h drive.h superbloc.h ifile.h mknfs.c
 dfs.o: mbr.h drive.h superbloc.h dfs.c current.c
 superbloc.o: mbr.h drive.h ifile.h superbloc.h  superbloc.c
 inode.o:inode.c inode.h mbr.h superbloc.h drive.h
+commons.o: commons.c commons.h
+builtins.o: builtins.c builtins.h commons.h file.h dir.h mount.h inode.h
 
 if_cfile.o: if_cfile.c ifile.h inode.h tools.h mount.h dir.h file.h
 if_dfile.o: if_dfile.c ifile.h inode.h tools.h mount.h dir.h file.h
 if_nfile.o: if_nfile.c ifile.h inode.h tools.h mount.h dir.h file.h
 if_pfile.o: if_pfile.c ifile.h inode.h tools.h mount.h dir.h file.h
-ifile.o: ifile.c inode.h tools.h ifile.h 
+ifile.o: ifile.c inode.h tools.h ifile.h
 mount.o: mount.c config.h tools.h inode.h mbr.h superbloc.h drive.h
 tools.o: tools.c tools.h
 file.o: file.c file.h dir.h ifile.h inode.h tools.h mount.h
 dir.o: dir.c dir.h ifile.h inode.h tools.h mount.h
-shell.o: shell.c ifile.h inode.h tools.h mount.h dir.h file.h
+shell.o: shell.c ctx.h mount.h builtins.h commons.h
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< $(INCDIR)
