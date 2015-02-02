@@ -31,7 +31,14 @@ create_file(const char *pathname, enum file_type_e type)
     if (! idir)
       return RETURN_FAILURE;
 
-    /* create the file */
+    /* We should not be able to open this pathname as it should not exists yes */
+    inumber = inumber_of_path(pathname);
+    if (inumber != 0){
+        printf("Error creating %s, file already exists\n", pathname);
+        return RETURN_FAILURE;
+    }
+
+    /* Okay, this pathname does not exists yet, create it ! */
     inumber = create_ifile(type);
     if (! inumber)
       return RETURN_FAILURE;

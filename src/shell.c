@@ -129,22 +129,6 @@ void canonical_path(char* canonical, char* path){
   }
 }
 
-/* Try to open the file. If you can open the file, the name is already taken. Else you can create a file with this name
- */
-int exists(char* arguments){
-  file_desc_t fd;
-  int status;
-  char target[MAXPROMPT];
-  canonical_path(target, arguments);
-
-  status = open_file(&fd, target);
-  if (status == RETURN_FAILURE){
-    return 0;
-  }
-  close_file(&fd);
-  return 1;
-}
-
 
 /* Maintain a compact list of all builtins commands with their usage
  */
@@ -244,11 +228,6 @@ void do_cp(char* arguments){
   canonical_path(canonical_source, source);
   canonical_path(canonical_dest, dest);
 
-  if (exists(canonical_dest)){
-    printf("Impossible to copy the file with this name. Please try an other one.\n");
-    return;
-  }
-
   verbose("cp %s %s\n", canonical_source, canonical_dest);
 
   inumber = create_file(canonical_dest, FILE_FILE);
@@ -285,11 +264,6 @@ void do_ed(char* arguments){
   int c;
   char target[MAXPROMPT];
   canonical_path(target, arguments);
-
-  if (exists(target)){
-    printf("Impossible to create a file with this name. Please try an other one.\n");
-    return;
-  }
 
   printf("please wait ...");
   fflush(stdout);
