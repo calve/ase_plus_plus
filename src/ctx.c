@@ -92,21 +92,17 @@ void switch_to_ctx (struct ctx_s *ctx){
   }
 }
 
-void start_sched(){
-  start_hw();
-  _mask(1);
-  yield();
-}
-
 
 void yield(){
-  if (first_context == 1)
-    {
-      first_context = 0;
-      switch_to_ctx(current_ctx);
-    }
-  else
-    {
-      switch_to_ctx(current_ctx->next);
-    }
+  if (current_ctx){
+    if (first_context == 1)
+      {
+        first_context = 0;
+        switch_to_ctx(current_ctx);
+      }
+    else
+      {
+        switch_to_ctx(current_ctx->next);
+      }
+  }
 }

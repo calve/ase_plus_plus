@@ -10,11 +10,3 @@ void irq_enable(){
 void irq_disable(){
   _mask(17);
 }
-
-void setup_irq(unsigned int irq, irq_handler_func_t handler){
-  IRQVECTOR[irq] = handler;
-}
-
-void start_hw(){
-  printf("started hardware\n");
-}

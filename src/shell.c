@@ -30,6 +30,7 @@ int construct_prompt(char* string, int string_size)
   return 0;
 }
 
+static void empty_it(){ return; }
 
 static void
 timer_it() {
@@ -160,18 +161,28 @@ void shell_loop(void* arguments) {
 /* Set up hardware configuration
  */
 int boot(){
-  mount_volume(0); /* Init harddrive, hardware and empty interruptions */
-  verbose("Volume 0 has been automatically mounted. Use ``mount`` to mount another\n");
-  IRQVECTOR[TIMER_IRQ] = timer_it;
+  char *hw_config;
+  int status, i;
+
+  /* Hardware initialization */
+  hw_config = "hardware.ini";
+  status = init_hardware(hw_config);
+  if (status == 0){
+    printf("error in hardware initialization with %s\n", hw_config);
+    exit(1);
+  }
+  printf("will bind interrupts\n");
+  /* Interrupt handlers */
+  for(i=0; i<16; i++)
+    IRQVECTOR[i] = empty_it;
   _out(TIMER_PARAM,128+64); /* reset + alarm on + 8 tick / alarm */
   _out(TIMER_ALARM,0xFFFFFFFD);  /* alarm at next tick (at 0xFFFFFFFF) */
+  IRQVECTOR[TIMER_IRQ] = timer_it;
+
+  /* We are ready, begin to catch interruptions */
+  _mask(1);
   verbose("Binded timer interruptions\n");
-  printf("Welcome in shell. Build date %s %s\n", __DATE__, __TIME__);
-  printf("Type ``help`` to find out all the available commands in this shell\n");
-  printf("Add ``&`` in front of a command to run it in a new context (in background)\n");
-  printf("\n");
-  create_ctx(16000, shell_loop, NULL);
-  start_sched();
+
   return 0;
 }
 
@@ -188,6 +199,16 @@ int main(int argc, char** argv){
   }
 
   boot();
+  verbose("Boot successfull\n");
+  mount_volume(0);
+  verbose("Volume 0 has been automatically mounted. Use ``mount`` to mount another\n");
+
+  printf("Welcome in shell. Build date %s %s\n", __DATE__, __TIME__);
+  printf("Type ``help`` to find out all the available commands in this shell\n");
+  printf("Add ``&`` in front of a command to run it in a new context (in background)\n");
+  printf("\n");
+  create_ctx(16000, shell_loop, NULL);
+  yield();
 
   umount();
   fflush(stdout);
