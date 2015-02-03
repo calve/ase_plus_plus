@@ -109,14 +109,14 @@ void do_cp(char* arguments){
 
   inumber = create_file(canonical_dest, FILE_FILE);
   if (inumber == RETURN_FAILURE){
-    printf("erreur creation fichier");
+    printf("erreur creation fichier\n");
     printf("%u\n", inumber);
     return;
   }
 
   status = open_ifile(&dfd, inumber);
   if (status != RETURN_SUCCESS){
-    printf("erreur ouverture fichier %d", inumber);
+    printf("erreur ouverture fichier %d\n", inumber);
     return;
   }
 
