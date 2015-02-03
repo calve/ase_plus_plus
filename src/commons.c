@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include "commons.h"
+#include "../include/hardware.h"
+#include "hardware_ini.h"
 
 int is_verbose = 0;
 char cwd[MAXPROMPT] = "/";
@@ -49,5 +51,15 @@ void canonical_path(char* canonical, char* path){
   }
   if (strlen(canonical) == 0){ /* Ensure canonical path is not empty */
     strncat(canonical, "/", 1);
+  }
+}
+
+void second_sleep(int seconds){
+  /* Wait for i seconds */
+  int old_time;
+  old_time = _in(TIMER_CLOCK);
+  while (1){
+    if (_in(TIMER_CLOCK) >= old_time+seconds*1000)
+      break;
   }
 }
