@@ -13,7 +13,7 @@ void do_help(){
   printf("List of built-in commands :\n");
   printf("  cat path\n");
   printf("  cd absolute_path\n");
-  printf("  compute integer\n");
+  printf("  compute integer [path]\n");
   printf("  cp source target\n");
   printf("  ed path (the EDitor)\n");
   printf("  exit       -- to exit the shell\n");
@@ -74,15 +74,40 @@ void do_cd(char* arguments){
 
 /* A function that do heavy computing used to test contexts */
 void do_compute(char* arguments){
-  int res = 0;
-  int max;
-  max = atoi(arguments);
-  for (int i = 0; i<max; i++){
-    for (int j = i; j<max; j++){
-      res += j;
+  int max, status, inumber, argn;
+  char path[MAXPROMPT], target[MAXPROMPT];
+  file_desc_t fd;
+  argn = sscanf(arguments, "%i %s", &max, path);
+  if (argn > 1){
+    printf("Will slowly write number until %i to %s\n", max, path);
+    canonical_path(target, path);
+    inumber = create_file(target, FILE_FILE);
+    status = open_ifile(&fd, inumber);
+    if (status != RETURN_SUCCESS){
+      printf("erreur ouverture fichier %d\n", inumber);
+      return;
     }
   }
-  printf("finished computing, result %i\n", res);
+  for (int i = 0; i<=max; i++){
+    second_sleep(i);
+    if (argn > 1)
+      {
+        for (int j = 0; j<i; j++)
+          {
+            writec_ifile(&fd, '.');
+          }
+        writec_ifile(&fd, '\n');
+        printf("wrote %i dots on %s\n", i, target);
+      }
+    else
+      {
+        printf("got %i dots on nothing!\n", i);
+      }
+  }
+  if (argn > 1){
+    printf("finished writing on %s\n", target);
+    close_file(&fd);
+  }
 }
 
 void do_cp(char* arguments){
