@@ -94,6 +94,7 @@ Exemple d'utilisation du shell ``./bin/shell``
 
 # Todo
 
-voir sceance2.md
++ procédure ``boot()``
++ voir sceance4.md
 
 # BUGS
