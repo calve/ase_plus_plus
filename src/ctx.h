@@ -17,7 +17,7 @@ typedef struct ctx_s {
   func_t *function;
   int blocked;
   struct ctx_s *next;
-  /* struct ctx_s *next_semaphore_context; */ /* may be next */
+  struct ctx_s *next_semaphore_context;  /* may be next */
   unsigned int canary;
   void *arguments;
   void *ebp;

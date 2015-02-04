@@ -62,7 +62,7 @@ vm.o: vm.c
 current.o: current.c 
 
 hw.o: hw.c hw.h
-ctx.o: ctx.c ctx.h hw.h
+ctx.o: ctx.c ctx.h hw.h sem.h
 drive.o: drive.c drive.h
 mbr.o: mbr.c drive.h mbr.h
 mkvol.o: mbr.c mbr.h drive.h
