@@ -133,50 +133,52 @@ int is_background(char* command_line){
     return 0;
 }
 
+/* Look up NAME as the name of a command, and return a pointer to that
+   command.  Return a NULL pointer if NAME isn't a command name. */
+COMMAND* find_command(char* name) {
+  register int i;
 
-/* Evaluate a command runned inside the shell
- */
-int eval(char *cmd){
-  char *arguments = get_arguments(cmd);
+  for (i = 0; commands[i].name; i++)
+    if (strcmp (name, commands[i].name) == 0)
+      return (&commands[i]);
 
-  if(!is_command(cmd, "cat")){
-    do_cat(arguments);
-  }
-  else if(!is_command(cmd, "cd")){
-    do_cd(arguments);
-  }
-  else if(!is_command(cmd, "compute")){
-    do_compute(arguments);
-  }
-  else if(!is_command(cmd, "cp")){
-    do_cp(arguments);
-  }
-  else if(!is_command(cmd, "ed")){
-    do_ed(arguments);
-  }
-  else if(!is_command(cmd, "help")){
-    do_help();
-  }
-  else if(!is_command(cmd, "ls")){
-    do_ls(arguments);
-  }
-  else if(!is_command(cmd, "mkdir")){
-    do_mkdir(arguments);
-  }
-  else if(!is_command(cmd, "mount")){
-    do_mount(arguments);
-  }
-  else if(!is_command(cmd, "rm")){
-    do_rm(arguments);
-  }
-  else if(!is_command(cmd, "exit")){
-    do_exit();
-  }
-  else{
-    printf("Unknow command\n");
-    return 1;
-  }
-  return 0;
+  return ((COMMAND *)NULL);
+}
+
+/* Execute a command line. */
+int eval(char* line){
+  register int i;
+  COMMAND *command;
+  char *word;
+
+  /* Isolate the command word. */
+  i = 0;
+  while (line[i] && whitespace (line[i]))
+    i++;
+  word = line + i;
+
+  while (line[i] && !whitespace (line[i]))
+    i++;
+
+  if (line[i])
+    line[i++] = '\0';
+
+  command = find_command(word);
+
+  if (!command)
+    {
+      fprintf (stderr, "%s: No such command.\n", word);
+      return-1;
+    }
+
+  /* Get argument to command, if any. */
+  while (whitespace (line[i]))
+    i++;
+
+  word = line + i;
+
+  /* Call the function. */
+  return ((*(command->func)) (word));
 }
 
 

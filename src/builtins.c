@@ -6,24 +6,64 @@
 #include "dir.h"
 #include "mount.h"
 #include "inode.h"              /* Needed for file_type_e */
+#include "builtins.h"
 
-/* Maintain a compact list of all builtins commands with their usage
+/* The list of available command name, the function they call, and an inline help
  */
-void do_help(){
-  printf("List of built-in commands :\n");
-  printf("  cat path\n");
-  printf("  cd absolute_path\n");
-  printf("  compute integer [path]\n");
-  printf("  cp source target\n");
-  printf("  ed path (the EDitor)\n");
-  printf("  exit       -- to exit the shell\n");
-  printf("  help\n");
-  printf("  ls [path]\n");
-  printf("  mkdir path\n");
-  printf("  mount volume\n");
-  printf("  rm path\n");
-  printf("  rmdir path\n");
+COMMAND commands[] = {
+  { "cat", do_cat, "Print file FILE" },
+  { "cd", do_cd, "Change to directory DIR" },
+  { "compute", do_compute, "Compute stuffs DIR" },
+  { "cp", do_cp, "cp source dest DIR" },
+  { "ed", do_ed, "edit FILE" },
+  { "help", do_help, "Display this text" },
+  { "?", do_help, "Synonym for `help'" },
+  { "ls", do_ls, "Synonym for `list'" },
+  { "mkdir", do_mkdir, "Make a directory" },
+  { "mount", do_mount, "Mount a volume" },
+  { "rm", do_rm, "Remove a volume" },
+  { "exit", do_exit, "Quit" },
+  { (char *)0, (void *)0, (char *)0 }
+};
+
+/* Print out help for ARG, or for all of the commands if ARG is
+   not present. */
+int do_help (char* arg) {
+  register int i;
+  int printed = 0;
+
+  for (i = 0; commands[i].name; i++)
+    {
+      if (!*arg || (strcmp (arg, commands[i].name) == 0))
+        {
+          printf ("%s\t\t%s.\n", commands[i].name, commands[i].doc);
+          printed++;
+        }
+    }
+
+  if (!printed)
+    {
+      printf ("No commands match `%s'.  Possibilties are:\n", arg);
+
+      for (i = 0; commands[i].name; i++)
+        {
+          /* Print in six columns. */
+          if (printed == 6)
+            {
+              printed = 0;
+              printf ("\n");
+            }
+
+          printf ("%s\t", commands[i].name);
+          printed++;
+        }
+
+      if (printed)
+        printf ("\n");
+    }
+  return 0;
 }
+
 
 
 /* Above are listed all builtins commands
@@ -31,7 +71,7 @@ void do_help(){
  */
 
 
-void do_cat(char* arguments){
+int do_cat(char* arguments){
   file_desc_t fd;
   int status;
   int c;
@@ -41,7 +81,7 @@ void do_cat(char* arguments){
   status = open_file(&fd, target);
   if (status == RETURN_FAILURE){
     printf("Cannot open %s\n", target);
-    return;
+    return 1;
   }
 
   while((c=readc_file(&fd)) != READ_EOF)
@@ -49,10 +89,11 @@ void do_cat(char* arguments){
 
   close_file(&fd);
   printf("\n");
+  return 0;
 }
 
 
-void do_cd(char* arguments){
+int do_cd(char* arguments){
   int status;
   char target[MAXPROMPT];
   canonical_path(target, arguments);
@@ -70,10 +111,11 @@ void do_cd(char* arguments){
   else {
     strcpy(cwd, target);
   }
+  return 0;
 }
 
 /* A function that do heavy computing used to test contexts */
-void do_compute(char* arguments){
+int do_compute(char* arguments){
   int max, status, inumber, argn;
   char path[MAXPROMPT], target[MAXPROMPT];
   file_desc_t fd;
@@ -85,7 +127,7 @@ void do_compute(char* arguments){
     status = open_ifile(&fd, inumber);
     if (status != RETURN_SUCCESS){
       printf("erreur ouverture fichier %d\n", inumber);
-      return;
+      return 1;
     }
   }
   for (int i = 0; i<=max; i++){
@@ -108,9 +150,10 @@ void do_compute(char* arguments){
     printf("finished writing on %s\n", target);
     close_file(&fd);
   }
+  return 0;
 }
 
-void do_cp(char* arguments){
+int do_cp(char* arguments){
   file_desc_t sfd, dfd;
   unsigned int inumber;
   int status;
@@ -124,7 +167,7 @@ void do_cp(char* arguments){
   status = sscanf(arguments, "%s %s", source, dest);
   if (status != 2 && status == EOF){
     printf("Error while parsing command line : ``cp %s``\n", arguments);
-    return;
+    return 1;
   }
   
   canonical_path(canonical_source, source);
@@ -136,30 +179,31 @@ void do_cp(char* arguments){
   if (inumber == RETURN_FAILURE){
     printf("erreur creation fichier\n");
     printf("%u\n", inumber);
-    return;
+    return 1;
   }
 
   status = open_ifile(&dfd, inumber);
   if (status != RETURN_SUCCESS){
     printf("erreur ouverture fichier %d\n", inumber);
-    return;
+    return 1;
   }
 
   status = open_file(&sfd, canonical_source);
   if (status != RETURN_SUCCESS){
     printf("cannot open %s\n", source);
-    return;
+    return 1;
   }
 
   while((c=readc_file(&sfd)) != READ_EOF)
     writec_file(&dfd, c);
   close_file(&dfd);
   close_file(&sfd);
+  return 0;
 }
 
 
 /* ed is the standard editor */
-void do_ed(char* arguments){
+int do_ed(char* arguments){
   file_desc_t fd;
   unsigned int inumber;
   int status;
@@ -173,12 +217,12 @@ void do_ed(char* arguments){
   if (inumber == RETURN_FAILURE ){
     printf("erreur creation fichier");
     printf("%u\n", inumber);
-    return;
+    return 1;
   }
   status = open_ifile(&fd, inumber);
   if (status != RETURN_SUCCESS){
     printf("erreur ouverture fichier %d", inumber);
-    return;
+    return 1;
   }
   printf(" file opened, you can now enter your text\n");
   while((c=getchar()) != EOF)
@@ -187,14 +231,16 @@ void do_ed(char* arguments){
     }
   close_file(&fd);
   printf("\n");
+  return 0;
 }
 
-void do_exit(){
+int do_exit(char* arguments){
   exit(EXIT_SUCCESS);
+  return 0;
 }
 
 /* Print the current working directory only for the moment */
-void do_ls(char* arguments){
+int do_ls(char* arguments){
   file_desc_t current;
   struct entry_s entry;
   int counter = 0;
@@ -207,12 +253,13 @@ void do_ls(char* arguments){
     counter++;
   }
   if (counter > 0) {
-      printf("\n");
+    printf("\n");
   }
   close_file(&current);
+  return 0;
 }
 
-void do_mkdir(char* arguments){
+int do_mkdir(char* arguments){
   int status;
   char target[MAXPROMPT];
 
@@ -221,15 +268,17 @@ void do_mkdir(char* arguments){
   if (status == RETURN_FAILURE){
     printf("Failed to create %s\n", target);
   }
+  return 0;
 }
 
-void do_mount(char* arguments){
+int do_mount(char* arguments){
   int volume;
   sscanf(arguments, "%i", &volume);
   mount_volume(volume);
+  return 0;
 }
 
-void do_rm(char* arguments){
+int do_rm(char* arguments){
   int status;
   char target[MAXPROMPT];
   canonical_path(target, arguments);
@@ -238,4 +287,5 @@ void do_rm(char* arguments){
   if (status == RETURN_FAILURE){
     printf("Error removing %s\n", target);
   }
+  return 0;
 }
