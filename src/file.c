@@ -8,6 +8,8 @@
 */
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "mbr.h"
 #include "superbloc.h"
@@ -87,6 +89,29 @@ open_file(file_desc_t *fd, const char *pathname)
     status = open_ifile(fd, inumber);
 
     return status;
+}
+
+
+int list_directory(char subentries[][MAXPATH], int size, const char *pathname){
+    file_desc_t current;
+    int counter = 0;
+    struct entry_s entry;
+
+    open_file(&current, pathname);
+    for (int i = 0; i<size; i++){
+        strcpy(subentries[counter], "");
+    }
+    while (counter < size && read_ifile (&current, &entry, sizeof(struct entry_s)) != READ_EOF){
+        struct inode_s inode;
+        read_inode(entry.ent_inumber, &inode);
+        strcpy(subentries[counter], entry.ent_basename);
+        if (inode.type == FILE_DIRECTORY){
+            strcat(subentries[counter], "/");
+        }
+        counter++;
+    }
+    close_file(&current);
+    return counter;
 }
 
 void
