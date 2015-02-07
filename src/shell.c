@@ -100,35 +100,54 @@ char* command_generator (const char *text, int state)
  */
 char* list_generator (const char *text, int state)
 {
-       static int list_index, len;
-       char *name;
-       static char subentries[MAXPATH][MAXPATH];
-       static int entry_lenght;
+    static int list_index, len;
+    static int last_slash = 0;
+    char *name;
+    static char subentries[MAXPATH][MAXPATH];
+    static int entry_lenght;
+    char destination[MAXPROMPT] = "";
+    char target[MAXPROMPT];
 
+    /* If this is a new word to complete, initialize now.  This includes
+       saving the length of TEXT for efficiency, and initializing the index
+       variable to 0. */
+    if (!state)
+        {
+            int i;
+            len = strlen (text);
+            for (i = len-1; i>=0; i--){
+                if (text[i] == '/'){
+                    last_slash = i;
+                    break;
+                }
+            }
+            if (last_slash > 0){
+                strcat(destination, cwd);
+                strncat(destination, text, last_slash);
+                canonical_path(target, destination);
+             }
+            else {
+                canonical_path(target, cwd);
+            }
+            entry_lenght = list_directory(subentries, 1024, target);
+            list_index = 0;
+        }
+    /* Return the next name which partially matches from the file list. */
+    while (list_index < entry_lenght && (name = subentries[list_index]))
+        {
+            char fullname[MAXPATH] = "";
+            strncat(fullname, text, last_slash);
+            strcat(fullname, "/");
+            strcat(fullname, name);
+            list_index++;
+            if (strncmp (fullname, text, len) == 0)
+                return (strdup(fullname));
+            if (list_index == entry_lenght)
+                break;
+        }
 
-       /* If this is a new word to complete, initialize now.  This includes
-          saving the length of TEXT for efficiency, and initializing the index
-          variable to 0. */
-       if (!state)
-         {
-           entry_lenght = list_directory(subentries, 1024, cwd);
-           list_index = 0;
-           len = strlen (text);
-         }
-
-
-       /* Return the next name which partially matches from the file list. */
-       while (list_index < entry_lenght && (name = subentries[list_index]))
-         {
-             list_index++;
-             if (list_index == entry_lenght)
-                 break;
-             if (strncmp (name, text, len) == 0)
-                 return (strdup(name));
-         }
-
-       /* If no names matched, then return NULL. */
-       return ((char *)NULL);
+    /* If no names matched, then return NULL. */
+    return ((char *)NULL);
 }
 
 static void empty_it(){ return; }
