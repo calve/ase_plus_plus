@@ -98,13 +98,16 @@ int list_directory(char subentries[][MAXPATH], int size, const char *pathname){
     struct entry_s entry;
 
     open_file(&current, pathname);
-
     for (int i = 0; i<size; i++){
         strcpy(subentries[counter], "");
     }
     while (counter < size && read_ifile (&current, &entry, sizeof(struct entry_s)) != READ_EOF){
-
+        struct inode_s inode;
+        read_inode(entry.ent_inumber, &inode);
         strcpy(subentries[counter], entry.ent_basename);
+        if (inode.type == FILE_DIRECTORY){
+            strcat(subentries[counter], "/");
+        }
         counter++;
     }
     close_file(&current);
