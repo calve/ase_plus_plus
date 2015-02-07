@@ -13,9 +13,11 @@
 #include "commons.h"
 #include "builtins.h"
 #include "mount.h"
+#include "file.h"
 
 const char* shellsymbol = ">";
 char *command_generator PARAMS((const char *, int));
+char *list_generator PARAMS((const char *, int));
 char **shell_completion PARAMS((const char *, int, int));
 
 int construct_prompt(char* string, int string_size)
@@ -58,6 +60,8 @@ char** shell_completion (const char *text, int start, int end){
      directory. */
   if (start == 0)
     matches = rl_completion_matches (text, command_generator);
+  else
+    matches = rl_completion_matches (text, list_generator);
 
   return (matches);
 }
@@ -86,6 +90,41 @@ char* command_generator (const char *text, int state)
 
            if (strncmp (name, text, len) == 0)
              return (strdup(name));
+         }
+
+       /* If no names matched, then return NULL. */
+       return ((char *)NULL);
+}
+
+/* Generator function for files completion.
+ */
+char* list_generator (const char *text, int state)
+{
+       static int list_index, len;
+       char *name;
+       static char subentries[MAXPATH][MAXPATH];
+       static int entry_lenght;
+
+
+       /* If this is a new word to complete, initialize now.  This includes
+          saving the length of TEXT for efficiency, and initializing the index
+          variable to 0. */
+       if (!state)
+         {
+           entry_lenght = list_directory(subentries, 1024, cwd);
+           list_index = 0;
+           len = strlen (text);
+         }
+
+
+       /* Return the next name which partially matches from the file list. */
+       while (list_index < entry_lenght && (name = subentries[list_index]))
+         {
+             list_index++;
+             if (list_index == entry_lenght)
+                 break;
+             if (strncmp (name, text, len) == 0)
+                 return (strdup(name));
          }
 
        /* If no names matched, then return NULL. */
