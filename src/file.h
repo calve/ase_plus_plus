@@ -10,6 +10,7 @@
 #ifndef _FILE_H_
 #define _FILE_H_
 
+#define MAXPATH 1024
 #include "tools.h"	/* for RETURN_{FAILURE,SUCCESS} */
 #include "inode.h"	/* for file_type_e */
 #include "ifile.h"
@@ -37,6 +38,11 @@ int open_file(file_desc_t *fd, const char *pathname);
 void close_file(file_desc_t *fd);
 void flush_file(file_desc_t *fd);
 void seek_file(file_desc_t *fd, int offset);
+
+/* Read the subentries of a pathname, and fill the subentries array with at most size entries
+ * returns the number of entry found
+ */
+int list_directory(char subentries[][MAXPATH], int size, const char *pathname);
 
 /*------------------------------
   File accesses

@@ -241,21 +241,21 @@ int do_exit(char* arguments){
 
 /* Print the current working directory only for the moment */
 int do_ls(char* arguments){
-  file_desc_t current;
-  struct entry_s entry;
+  int entry_lenght;
   int counter = 0;
   char target[MAXPROMPT];
+  char subentries[MAXPATH][MAXPATH];
 
   canonical_path(target, arguments);
-  open_file(&current, target);
-  while (read_ifile (&current, &entry, sizeof(struct entry_s)) != READ_EOF){
-    printf("%s ",entry.ent_basename);
+  entry_lenght = list_directory(subentries, 1024, target);
+
+  while ( counter < entry_lenght){
+    printf("%s ",subentries[counter]);
     counter++;
   }
   if (counter > 0) {
     printf("\n");
   }
-  close_file(&current);
   return 0;
 }
 
