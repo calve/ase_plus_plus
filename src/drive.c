@@ -20,16 +20,11 @@ void seek_sector(unsigned int cylinder, unsigned int sector)
 
 void read_sector(unsigned int cylinder, unsigned int sector, unsigned char* buffer)
 {
-	int sizeSector;
-	seek_sector(cylinder, sector);
-	_out(HDA_DATAREGS, 0);
-	_out(HDA_DATAREGS+1, 1);
-	_out(HDA_CMDREG, CMD_READ);
-	_sleep(HDA_IRQ);
-	_out(HDA_CMDREG, CMD_DSKINFO);
-	sizeSector = _in(HDA_DATAREGS+4)<<8;
-	sizeSector += _in(HDA_DATAREGS+5);
-	memcpy(buffer, MASTERBUFFER, sizeSector);
+    int sector_size;
+    assert(buffer);
+    _out(HDA_CMDREG, CMD_DSKINFO);
+    sector_size = ((_in(HDA_DATAREGS+4)*0xFF) + _in(HDA_DATAREGS+5));
+    read_nsector(cylinder, sector, buffer, sector_size);
 }
 
 /* Reads n bytes of a sector
@@ -49,18 +44,13 @@ void read_nsector(unsigned int cylinder, unsigned int sector, unsigned char *buf
 }
 
 
-void write_sector(unsigned int cylinder, unsigned int sector, const unsigned char *buffer)
+void write_sector(unsigned int cylinder, unsigned int sector, unsigned char *buffer)
 {
-	int sizeSector;
-	_out(HDA_CMDREG, CMD_DSKINFO);
-	sizeSector = _in(HDA_DATAREGS+4)<<8;
-	sizeSector += _in(HDA_DATAREGS+5);
-	memcpy(MASTERBUFFER, buffer, sizeSector);
-	seek_sector(cylinder, sector);
-	_out(HDA_DATAREGS, 0);
-	_out(HDA_DATAREGS+1, 1);
-	_out(HDA_CMDREG, CMD_WRITE);
-	_sleep(HDA_IRQ);
+    int sector_size;
+    assert(buffer);
+    _out(HDA_CMDREG, CMD_DSKINFO);
+    sector_size = ((_in(HDA_DATAREGS+4)*0xFF) + _in(HDA_DATAREGS+5));
+    write_nsector(cylinder, sector, buffer, sector_size);
 }
 
 

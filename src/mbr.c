@@ -72,7 +72,7 @@ void read_nbloc(unsigned int vol, unsigned int nbloc, unsigned char *buffer, int
 }
 
 
-void write_bloc(unsigned int vol, unsigned int nbloc, const unsigned char *buffer)
+void write_bloc(unsigned int vol, unsigned int nbloc, unsigned char *buffer)
 {
 	int cylinder = ncyl_of_nbloc(vol, nbloc);
 	int sector = nsec_of_nbloc(vol, nbloc);
