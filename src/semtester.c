@@ -2,6 +2,7 @@
 #include "ctx.h"
 #include "../include/hardware.h"
 #include "hardware_ini.h"
+#include "commons.h"
 
 #define MAX_BUFFER 5
 
@@ -15,6 +16,7 @@ int producer(){
     while(1) {
         sem_down(&empty_count);
         sem_down(&mutex);
+        second_sleep(1);
         buffer = counter++;
         printf(" --> produced %i\n", buffer);
         sem_up(&mutex);
@@ -22,11 +24,24 @@ int producer(){
     }
 }
 
-int consummer(){
+int consummerA(){
     while(1) {
         sem_down(&fill_count);
         sem_down(&mutex);
-        printf(" <-- consume %i\n", buffer);
+        second_sleep(1);
+        printf(" <-- consume-A %i\n", buffer);
+        buffer--;
+        sem_up(&mutex);
+        sem_up(&empty_count);
+    }
+}
+
+int consummerB(){
+    while(1) {
+        sem_down(&fill_count);
+        sem_down(&mutex);
+        second_sleep(3);
+        printf(" <-- consume-B %i\n", buffer);
         buffer--;
         sem_up(&mutex);
         sem_up(&empty_count);
@@ -42,9 +57,9 @@ timer_it() {
 }
 
 int main(){
-    struct ctx_s *prod_ctx, *cons_ctx;
-      char *hw_config;
-  int status, i;
+    struct ctx_s *prod_ctx, *consA_ctx, *consB_ctx;
+    char *hw_config;
+    int status, i;
 
   /* Hardware initialization */
   hw_config = "hardware.ini";
@@ -67,7 +82,8 @@ int main(){
   sem_init(&mutex, 1);
   sem_init(&fill_count, 0);
   sem_init(&empty_count, MAX_BUFFER);
-  cons_ctx = create_ctx(16000, (void*) consummer, (void*) NULL);
+  consA_ctx = create_ctx(16000, (void*) consummerA, (void*) NULL);
+  consB_ctx = create_ctx(16000, (void*) consummerB, (void*) NULL);
   prod_ctx = create_ctx(16000, (void*) producer, (void*) NULL);
   yield();
   printf("hello world");
