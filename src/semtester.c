@@ -9,18 +9,18 @@
 struct sem_s mutex;
 struct sem_s fill_count;
 struct sem_s empty_count;
-int buffer;
+int head, tail =0;
 int counter = 0;
 
 int producer(){
     while(1) {
         sem_down(&empty_count);
         sem_down(&mutex);
-        second_sleep(1);
-        buffer = counter++;
-        printf(" --> produced %i\n", buffer);
+        head++;
+        printf(" --> produced %i\n", head);
         sem_up(&mutex);
         sem_up(&fill_count);
+        second_sleep(1);
     }
 }
 
@@ -28,11 +28,11 @@ int consummerA(){
     while(1) {
         sem_down(&fill_count);
         sem_down(&mutex);
-        second_sleep(1);
-        printf(" <-- consume-A %i\n", buffer);
-        buffer--;
+        tail++;
+        printf(" <-- consume-A %i\n", tail);
         sem_up(&mutex);
         sem_up(&empty_count);
+        second_sleep(3);
     }
 }
 
@@ -40,11 +40,11 @@ int consummerB(){
     while(1) {
         sem_down(&fill_count);
         sem_down(&mutex);
-        second_sleep(3);
-        printf(" <-- consume-B %i\n", buffer);
-        buffer--;
+        tail++;
+        printf(" <-- consume-B %i\n", tail);
         sem_up(&mutex);
         sem_up(&empty_count);
+        second_sleep(5);
     }
 }
 
