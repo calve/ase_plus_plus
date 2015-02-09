@@ -42,14 +42,15 @@ void sem_up(struct sem_s *sem)
   irq_disable();
   assert(sem->sem_magic_number==SEM_MAGIC_NUMBER);
   sem->sem_compteur = sem->sem_compteur + 1;
-  if (sem->sem_compteur >= 1)
+  if (sem->sem_compteur >= 1 && sem->sem_ctx_blocked)
   {
     assert(sem->sem_ctx_blocked);
     ctx = sem->sem_ctx_blocked;
     ctx->state = ACTIVABLE;
     sem->sem_ctx_blocked = ctx->next_semaphore_context;
-    ctx->next_semaphore_context=NULL;
   }
-  yield();
-}
+  else {
+    yield();
+  }
 
+}
