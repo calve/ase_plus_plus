@@ -57,9 +57,8 @@ timer_it() {
 }
 
 int main(){
-    struct ctx_s *prod_ctx, *consA_ctx, *consB_ctx;
-    char *hw_config;
-    int status, i;
+  char *hw_config;
+  int status, i;
 
   /* Hardware initialization */
   hw_config = "hardware.ini";
@@ -82,9 +81,9 @@ int main(){
   sem_init(&mutex, 1);
   sem_init(&fill_count, 0);
   sem_init(&empty_count, MAX_BUFFER);
-  consA_ctx = create_ctx(16000, (void*) consummerA, (void*) NULL);
-  consB_ctx = create_ctx(16000, (void*) consummerB, (void*) NULL);
-  prod_ctx = create_ctx(16000, (void*) producer, (void*) NULL);
+  create_ctx(16000, (void*) consummerA, (void*) NULL);
+  create_ctx(16000, (void*) consummerB, (void*) NULL);
+  create_ctx(16000, (void*) producer, (void*) NULL);
   yield();
   printf("hello world");
 }
