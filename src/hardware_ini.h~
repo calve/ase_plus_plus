@@ -10,4 +10,4 @@
 #define TIMER_PARAM     0xF4
 #define TIMER_IRQ       2
 
-
+#define CORE_STATUS		0x80

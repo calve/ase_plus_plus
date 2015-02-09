@@ -11,7 +11,7 @@ BINDIR = $(ROOTDIR)/bin
 LIBDIR  = -L$(ROOTDIR)/lib
 INCDIR  = -I$(ROOTDIR)/include
 LIBS    = -lhardware -lreadline
-#THREAD	= -lpthread
+THREAD	= -lpthread
 
 ###------------------------------
 ### Main targets
