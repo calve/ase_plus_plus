@@ -15,7 +15,7 @@ LIBS    = -lhardware -lreadline
 ###------------------------------
 ### Main targets
 ###------------------------------------------------------------
-BINARIES= mkhd dmps frmt vm mkvol dvol mknfs dfs if_pfile if_nfile if_cfile if_dfile shell
+BINARIES= mkhd dmps frmt vm mkvol dvol mknfs dfs if_pfile if_nfile if_cfile if_dfile semtester shell
 OBJECTS	= $(addsuffix .o,\
 	  ctx hw sem drive mbr tools ifile mount inode superbloc dir file commons builtins)
 
@@ -47,6 +47,8 @@ if_nfile: if_nfile.o $(OBJECTS)
 if_dfile: if_dfile.o $(OBJECTS)
 	$(CC) $(CFLAGS) -o $(BINDIR)/$@ $^ $(LIBDIR) $(LIBS)
 if_pfile: if_pfile.o ifile.o $(OBJECTS)
+	$(CC) $(CFLAGS) -o $(BINDIR)/$@ $^ $(LIBDIR) $(LIBS)
+semtester: semtester.o sem.o $(OBJECTS)
 	$(CC) $(CFLAGS) -o $(BINDIR)/$@ $^ $(LIBDIR) $(LIBS)
 shell: shell.o ifile.o $(OBJECTS)
 	$(CC) $(CFLAGS) -lreadline -o $(BINDIR)/$@ $^ $(LIBDIR) $(LIBS)
