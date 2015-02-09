@@ -23,7 +23,7 @@ void read_sector(unsigned int cylinder, unsigned int sector, unsigned char* buff
     int sector_size;
     assert(buffer);
     _out(HDA_CMDREG, CMD_DSKINFO);
-    sector_size = ((_in(HDA_DATAREGS+4)*0xFF) + _in(HDA_DATAREGS+5));
+    sector_size = ((_in(HDA_DATAREGS+4)<<8) + _in(HDA_DATAREGS+5));
     read_nsector(cylinder, sector, buffer, sector_size);
 }
 
@@ -49,7 +49,7 @@ void write_sector(unsigned int cylinder, unsigned int sector, unsigned char *buf
     int sector_size;
     assert(buffer);
     _out(HDA_CMDREG, CMD_DSKINFO);
-    sector_size = ((_in(HDA_DATAREGS+4)*0xFF) + _in(HDA_DATAREGS+5));
+    sector_size = ((_in(HDA_DATAREGS+4)<<8) + _in(HDA_DATAREGS+5));
     write_nsector(cylinder, sector, buffer, sector_size);
 }
 
