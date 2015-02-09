@@ -30,5 +30,6 @@ typedef struct ctx_s {
 void yield();
 struct ctx_s* create_ctx(int stack_size, func_t function, void *arguments);
 void delete_ctx();
+struct ctx_s *current_ctx;
 
 #endif

@@ -1,3 +1,5 @@
+#include "ctx.h"
+#include "hw.h"
 #include "sem.h"
 
 /* ====================== Semaphore ====================== */

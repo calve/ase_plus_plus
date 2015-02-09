@@ -17,7 +17,7 @@ LIBS    = -lhardware -lreadline
 ###------------------------------------------------------------
 BINARIES= mkhd dmps frmt vm mkvol dvol mknfs dfs if_pfile if_nfile if_cfile if_dfile shell
 OBJECTS	= $(addsuffix .o,\
-	  ctx hw drive mbr tools ifile mount inode superbloc dir file commons builtins)
+	  ctx hw sem drive mbr tools ifile mount inode superbloc dir file commons builtins)
 
 all: $(BINARIES) $(OBJECTS)
 
@@ -62,7 +62,8 @@ vm.o: vm.c
 current.o: current.c 
 
 hw.o: hw.c hw.h
-ctx.o: ctx.c ctx.h hw.h sem.h
+ctx.o: ctx.c ctx.h hw.h
+sem.o: sem.c sem.h ctx.h hw.h
 drive.o: drive.c drive.h
 mbr.o: mbr.c drive.h mbr.h
 mkvol.o: mbr.c mbr.h drive.h

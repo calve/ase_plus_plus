@@ -5,12 +5,11 @@
 #include "../include/hardware.h"
 #include "hw.h"
 #include "ctx.h"
-#include "sem.h"
 
 /* Use this constant to verify integrity of contexts */
 #define CANARY 0xCAFEBABE
 
-static struct ctx_s *current_ctx = NULL;
+struct ctx_s *current_ctx = NULL;
 static int first_context = 1;
 
 void switch_to_ctx(struct ctx_s *ctx);
