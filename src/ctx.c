@@ -102,7 +102,11 @@ void yield(){
       }
     else
       {
-        switch_to_ctx(current_ctx->next);
+        struct ctx_s *iterator = current_ctx->next;
+        while (iterator->state == BLOCKED){
+          iterator = iterator->next;
+        }
+        switch_to_ctx(iterator);
       }
   }
 }
