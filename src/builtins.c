@@ -244,10 +244,10 @@ int do_ls(char* arguments){
   int entry_lenght;
   int counter = 0;
   char target[MAXPROMPT];
-  char subentries[MAXPATH][MAXPATH];
+  char subentries[16][MAXPATH];
 
   canonical_path(target, arguments);
-  entry_lenght = list_directory(subentries, 1024, target);
+  entry_lenght = list_directory(subentries, 16, target);
 
   while ( counter < entry_lenght){
     printf("%s ",subentries[counter]);
