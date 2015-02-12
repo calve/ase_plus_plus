@@ -7,8 +7,10 @@
 #include "../include/hardware.h"
 #include "drive.h"
 #include "mbr.h"
+#include "sem.h"
 
 struct mbr_s mbr;
+struct sem_s mutex;
 
 static void
 empty_it()
@@ -21,6 +23,7 @@ void read_mbr()
 	unsigned char buff[HDA_SECTORSIZE];
 	read_sector(0,0,buff);
 	memcpy(&mbr, buff, sizeof(struct mbr_s)); /* mbr = *((struct mbr_s*)buffer);*/
+        sem_init(&mutex, 1);
 	if (mbr.magic_number != MBR_MAGIC)
 	{
 		/* Initialisation */
@@ -60,7 +63,9 @@ void read_bloc(unsigned int vol, unsigned int nbloc, unsigned char *buffer)
 {
 	int cylinder = ncyl_of_nbloc(vol, nbloc);
 	int sector = nsec_of_nbloc(vol, nbloc);
+        sem_down(&mutex);
 	read_sector(cylinder, sector, buffer);
+        sem_up(&mutex);
 }
 
 
@@ -68,7 +73,9 @@ void read_nbloc(unsigned int vol, unsigned int nbloc, unsigned char *buffer, int
 {
 	int cylinder = ncyl_of_nbloc(vol, nbloc);
 	int sector = nsec_of_nbloc(vol, nbloc);
+        sem_down(&mutex);
 	read_nsector(cylinder, sector, buffer, size);
+        sem_up(&mutex);
 }
 
 
@@ -76,14 +83,18 @@ void write_bloc(unsigned int vol, unsigned int nbloc, unsigned char *buffer)
 {
 	int cylinder = ncyl_of_nbloc(vol, nbloc);
 	int sector = nsec_of_nbloc(vol, nbloc);
+        sem_down(&mutex);
 	write_sector(cylinder, sector, buffer);
+        sem_up(&mutex);
 }
 
 void write_nbloc(unsigned int vol, unsigned int nbloc, unsigned char *buffer, int size)
 {
 	int cylinder = ncyl_of_nbloc(vol, nbloc);
 	int sector = nsec_of_nbloc(vol, nbloc);
+        sem_down(&mutex);
 	write_nsector(cylinder, sector, buffer, size);
+        sem_up(&mutex);
 }
 
 /* Format all sectors of one volume
@@ -92,12 +103,14 @@ void format_vol(unsigned int vol)
 {
 	int nsector = mbr.mbr_vol[vol].vol_nsectors;
         unsigned int i;
+        sem_down(&mutex);
         for (i = 0; i < mbr.mbr_vol[vol].vol_nsectors; i++)
           {
             int cylinder = ncyl_of_nbloc(vol, i);
             int sector = nsec_of_nbloc(vol, i);
             format_sector(cylinder, sector, nsector, 0);
           }
+        sem_up(&mutex);
 }
 
 char* display_type_vol(enum type_vol_e type)

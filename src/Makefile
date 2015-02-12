@@ -26,19 +26,19 @@ all: $(BINARIES) $(OBJECTS)
 ###------------------------------------------------------------
 mkhd: mkhd.o
 	$(CC) $(CFLAGS) -o $(BINDIR)/$@ $^ $(LIBDIR) $(LIBS)
-dmps: dmps.o drive.o
+dmps: dmps.o drive.o ctx.o hw.o
 	$(CC) $(CFLAGS) -o $(BINDIR)/$@ $^ $(LIBDIR) $(LIBS)
-frmt: frmt.o drive.o
+frmt: frmt.o drive.o ctx.o hw.o
 	$(CC) $(CFLAGS) -o $(BINDIR)/$@ $^ $(LIBDIR) $(LIBS)
-vm: vm.o mbr.o drive.o
+vm: vm.o mbr.o sem.o commons.o  ctx.o hw.o drive.o
 	$(CC) $(CFLAGS) -o $(BINDIR)/$@ $^ $(LIBDIR) $(LIBS)
-mkvol: mkvol.o mbr.o drive.o
+mkvol: mkvol.o mbr.o sem.o commons.o  ctx.o hw.o drive.o
 	$(CC) $(CFLAGS) -o $(BINDIR)/$@ $^ $(LIBDIR) $(LIBS)
-dvol: dvol.o mbr.o drive.o
+dvol: dvol.o mbr.o sem.o commons.o  ctx.o hw.o drive.o
 	$(CC) $(CFLAGS) -o $(BINDIR)/$@ $^ $(LIBDIR) $(LIBS)
-mknfs: mknfs.o mbr.o drive.o superbloc.o ifile.o inode.o tools.o
+mknfs: mknfs.o mbr.o sem.o commons.o  ctx.o hw.o drive.o superbloc.o ifile.o inode.o tools.o
 	$(CC) $(CFLAGS) -o $(BINDIR)/$@ $^ $(LIBDIR) $(LIBS)
-dfs: dfs.o mbr.o drive.o superbloc.o ifile.o inode.o tools.o current.o
+dfs: dfs.o mbr.o sem.o commons.o  ctx.o hw.o drive.o superbloc.o ifile.o inode.o tools.o current.o
 	$(CC) $(CFLAGS) -o $(BINDIR)/$@ $^ $(LIBDIR) $(LIBS)
 if_cfile: if_cfile.o $(OBJECTS)
 	$(CC) $(CFLAGS) -o $(BINDIR)/$@ $^ $(LIBDIR) $(LIBS)
@@ -48,7 +48,7 @@ if_dfile: if_dfile.o $(OBJECTS)
 	$(CC) $(CFLAGS) -o $(BINDIR)/$@ $^ $(LIBDIR) $(LIBS)
 if_pfile: if_pfile.o ifile.o $(OBJECTS)
 	$(CC) $(CFLAGS) -o $(BINDIR)/$@ $^ $(LIBDIR) $(LIBS)
-semtester: semtester.o sem.o $(OBJECTS)
+semtester: semtester.o sem.o commons.o  ctx.o hw.o $(OBJECTS)
 	$(CC) $(CFLAGS) -o $(BINDIR)/$@ $^ $(LIBDIR) $(LIBS)
 shell: shell.o ifile.o $(OBJECTS)
 	$(CC) $(CFLAGS) -lreadline -o $(BINDIR)/$@ $^ $(LIBDIR) $(LIBS)
@@ -65,15 +65,15 @@ current.o: current.c
 
 hw.o: hw.c hw.h
 ctx.o: ctx.c ctx.h hw.h
-sem.o: sem.c sem.h ctx.h hw.h
-drive.o: drive.c drive.h
-mbr.o: mbr.c drive.h mbr.h
-mkvol.o: mbr.c mbr.h drive.h
-dvol.o: mbr.c mbr.h drive.h
-mknfs.o: mbr.h drive.h superbloc.h ifile.h mknfs.c
-dfs.o: mbr.h drive.h superbloc.h dfs.c current.c
-superbloc.o: mbr.h drive.h ifile.h superbloc.h  superbloc.c
-inode.o:inode.c inode.h mbr.h superbloc.h drive.h
+sem.o: sem.c sem.h ctx.h hw.h commons.h
+drive.o: drive.c drive.h sem.h ctx.h
+mbr.o: mbr.c drive.h mbr.h sem.h ctx.h
+mkvol.o: mbr.c mbr.h drive.h sem.h ctx.h
+dvol.o: mbr.c mbr.h drive.h sem.h ctx.h
+mknfs.o: mbr.h drive.h superbloc.h ifile.h mknfs.c sem.h ctx.h
+dfs.o: mbr.h drive.h superbloc.h dfs.c current.c sem.h ctx.h
+superbloc.o: mbr.h sem.h ctx.h drive.h ifile.h superbloc.h  superbloc.c
+inode.o:inode.c inode.h mbr.h sem.h ctx.h superbloc.h drive.h
 commons.o: commons.c commons.h
 builtins.o: builtins.c builtins.h commons.h file.h dir.h mount.h inode.h
 
@@ -82,7 +82,7 @@ if_dfile.o: if_dfile.c ifile.h inode.h tools.h mount.h dir.h file.h
 if_nfile.o: if_nfile.c ifile.h inode.h tools.h mount.h dir.h file.h
 if_pfile.o: if_pfile.c ifile.h inode.h tools.h mount.h dir.h file.h
 ifile.o: ifile.c inode.h tools.h ifile.h
-mount.o: mount.c config.h tools.h inode.h mbr.h superbloc.h drive.h
+mount.o: mount.c config.h tools.h inode.h mbr.h sem.h ctx.h superbloc.h drive.h
 tools.o: tools.c tools.h
 file.o: file.c file.h dir.h ifile.h inode.h tools.h mount.h
 dir.o: dir.c dir.h ifile.h inode.h tools.h mount.h
