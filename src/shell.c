@@ -251,7 +251,7 @@ void shell_loop(void* arguments) {
 
     /* Read command line */
     cmdline = readline(prompt);
-
+    fflush(stdin);
     if (!cmdline) {    /* End of file (ctrl-d) */
       printf("\n");    /* Give a clean prompt to user */
       break;
