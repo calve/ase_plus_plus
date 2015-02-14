@@ -10,7 +10,7 @@
 #include "sem.h"
 
 struct mbr_s mbr;
-struct sem_s mutex;
+struct sem_s mbr_mutex;
 
 static void
 empty_it()
@@ -23,9 +23,10 @@ void read_mbr()
 	unsigned char buff[HDA_SECTORSIZE];
 	read_sector(0,0,buff);
 	memcpy(&mbr, buff, sizeof(struct mbr_s)); /* mbr = *((struct mbr_s*)buffer);*/
-        sem_init(&mutex, 1);
+        sem_init(&mbr_mutex, 1);
 	if (mbr.magic_number != MBR_MAGIC)
 	{
+                printf("init the mbr\n");
 		/* Initialisation */
 		mbr.nbvols = 0;
 		memset(&mbr.mbr_vol, 0, sizeof(struct vol_s)*MAXVOL);
@@ -63,9 +64,9 @@ void read_bloc(unsigned int vol, unsigned int nbloc, unsigned char *buffer)
 {
 	int cylinder = ncyl_of_nbloc(vol, nbloc);
 	int sector = nsec_of_nbloc(vol, nbloc);
-        sem_down(&mutex);
+        sem_down(&mbr_mutex);
 	read_sector(cylinder, sector, buffer);
-        sem_up(&mutex);
+        sem_up(&mbr_mutex);
 }
 
 
@@ -73,9 +74,9 @@ void read_nbloc(unsigned int vol, unsigned int nbloc, unsigned char *buffer, int
 {
 	int cylinder = ncyl_of_nbloc(vol, nbloc);
 	int sector = nsec_of_nbloc(vol, nbloc);
-        sem_down(&mutex);
+        sem_down(&mbr_mutex);
 	read_nsector(cylinder, sector, buffer, size);
-        sem_up(&mutex);
+        sem_up(&mbr_mutex);
 }
 
 
@@ -83,18 +84,18 @@ void write_bloc(unsigned int vol, unsigned int nbloc, unsigned char *buffer)
 {
 	int cylinder = ncyl_of_nbloc(vol, nbloc);
 	int sector = nsec_of_nbloc(vol, nbloc);
-        sem_down(&mutex);
+        sem_down(&mbr_mutex);
 	write_sector(cylinder, sector, buffer);
-        sem_up(&mutex);
+        sem_up(&mbr_mutex);
 }
 
 void write_nbloc(unsigned int vol, unsigned int nbloc, unsigned char *buffer, int size)
 {
 	int cylinder = ncyl_of_nbloc(vol, nbloc);
 	int sector = nsec_of_nbloc(vol, nbloc);
-        sem_down(&mutex);
+        sem_down(&mbr_mutex);
 	write_nsector(cylinder, sector, buffer, size);
-        sem_up(&mutex);
+        sem_up(&mbr_mutex);
 }
 
 /* Format all sectors of one volume
@@ -103,14 +104,14 @@ void format_vol(unsigned int vol)
 {
 	int nsector = mbr.mbr_vol[vol].vol_nsectors;
         unsigned int i;
-        sem_down(&mutex);
+        sem_down(&mbr_mutex);
         for (i = 0; i < mbr.mbr_vol[vol].vol_nsectors; i++)
           {
             int cylinder = ncyl_of_nbloc(vol, i);
             int sector = nsec_of_nbloc(vol, i);
             format_sector(cylinder, sector, nsector, 0);
           }
-        sem_up(&mutex);
+        sem_up(&mbr_mutex);
 }
 
 char* display_type_vol(enum type_vol_e type)
