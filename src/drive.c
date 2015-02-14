@@ -7,15 +7,37 @@
 #include "hardware_ini.h"
 #include "../include/hardware.h"
 #include "drive.h"
+#include "ctx.h"
+#include "sem.h"
+#include "hw.h"
+
+extern struct ctx_s *waiting_ctx;
+
+void sleep_ctx(){
+    if (current_ctx){
+        waiting_ctx = current_ctx;
+        waiting_ctx->state = BLOCKED;
+        printf("wait ctx\n");
+        yield();
+                //_sleep(HDA_IRQ);
+        _out(TIMER_ALARM, 0xFFFFFFF0);
+        waiting_ctx = (void*) 0;
+        printf("good\n");
+    }
+    else{
+        _sleep(HDA_IRQ);
+    }
+}
 
 void seek_sector(unsigned int cylinder, unsigned int sector)
 {
+    printf("seek\n");
 	_out(HDA_DATAREGS, (cylinder>>8)&0xFF);
 	_out(HDA_DATAREGS + 1, cylinder&0xFF);
 	_out(HDA_DATAREGS + 2, (sector>>8)&0xFF);
 	_out(HDA_DATAREGS + 3, sector&0xFF);
 	_out(HDA_CMDREG, CMD_SEEK);
-	_sleep(HDA_IRQ);
+	sleep_ctx();
 }
 
 void read_sector(unsigned int cylinder, unsigned int sector, unsigned char* buffer)
@@ -33,14 +55,17 @@ void read_sector(unsigned int cylinder, unsigned int sector, unsigned char* buff
 void read_nsector(unsigned int cylinder, unsigned int sector, unsigned char *buffer, int size){
     int i;
     assert(size);
+    printf("read\n");
     seek_sector(cylinder, sector);
     _out(HDA_DATAREGS, 0);
     _out(HDA_DATAREGS + 1, 1);
     _out(HDA_CMDREG, CMD_READ);
-    _sleep(HDA_IRQ);
+    sleep_ctx();
+    irq_disable();
     for (i=0; i < size; i++){
         buffer[i] = MASTERBUFFER[i];
     }
+    irq_enable();
 }
 
 
@@ -58,7 +83,7 @@ void write_sector(unsigned int cylinder, unsigned int sector, unsigned char *buf
  */
 void write_nsector(unsigned int cylinder, unsigned int sector, unsigned char *buffer, int size){
     int i;
-
+    printf("write\n");
     assert(size);
     assert(buffer);
 
@@ -66,11 +91,10 @@ void write_nsector(unsigned int cylinder, unsigned int sector, unsigned char *bu
         MASTERBUFFER[i] = buffer[i];
     }
     seek_sector(cylinder, sector);
-
     _out(HDA_DATAREGS, (size & 0xFF00));
     _out(HDA_DATAREGS + 1, (size & 0xFF));
     _out(HDA_CMDREG, CMD_WRITE);
-    _sleep(HDA_IRQ);
+    sleep_ctx();
 }
 
 void format_sector(unsigned int cylinder, unsigned int sector, unsigned int nsector, unsigned int value)
@@ -83,7 +107,7 @@ void format_sector(unsigned int cylinder, unsigned int sector, unsigned int nsec
 	_out(HDA_DATAREGS + 4, (value>>8)&0xFF);
 	_out(HDA_DATAREGS + 5, value&0xFF);
 	_out(HDA_CMDREG, CMD_FORMAT);
-	_sleep(HDA_IRQ);
+	sleep_ctx();
 }
 
 /* dump buffer to stdout,

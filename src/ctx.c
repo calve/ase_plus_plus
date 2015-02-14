@@ -10,6 +10,7 @@
 #define CANARY 0xCAFEBABE
 
 struct ctx_s *current_ctx = NULL;
+struct ctx_s *waiting_ctx = NULL;
 static int first_context = 1;
 
 void switch_to_ctx(struct ctx_s *ctx);
@@ -81,16 +82,16 @@ void delete_ctx(){
 /* Switch from one context to another
  */
 void switch_to_ctx (struct ctx_s *ctx){
-  irq_disable();
   assert(ctx);
+  assert(ctx->canary == CANARY);
+  assert(ctx->state != BLOCKED);
+  irq_disable();
   if (current_ctx){
     asm("movl %%esp, %0"
         :"=r" (current_ctx->esp));
     asm("movl %%ebp, %0"
         :"=r" (current_ctx->ebp));
   }
-  assert(ctx->canary == CANARY);
-  assert(ctx->state != BLOCKED);
   current_ctx = ctx;
   asm("movl %0, %%esp"
       :
@@ -107,6 +108,7 @@ void switch_to_ctx (struct ctx_s *ctx){
     delete_ctx();
     yield();
   }
+  irq_enable();
 }
 
 
@@ -123,7 +125,9 @@ void yield(){
         while (iterator->state == BLOCKED){
           iterator = iterator->next;
         }
-        switch_to_ctx(iterator);
+        if(current_ctx != iterator){
+          switch_to_ctx(iterator);
+        }
       }
   }
 }

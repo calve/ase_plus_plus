@@ -14,11 +14,14 @@
 #include "builtins.h"
 #include "mount.h"
 #include "file.h"
+#include "hw.h"
 
 const char* shellsymbol = ">";
 char *command_generator PARAMS((const char *, int));
 char *list_generator PARAMS((const char *, int));
 char **shell_completion PARAMS((const char *, int, int));
+
+extern struct ctx_s *waiting_ctx;
 
 int construct_prompt(char* string, int string_size)
 {
@@ -152,9 +155,20 @@ char* list_generator (const char *text, int state)
 
 static void empty_it(){ return; }
 
+static void disk_it() {
+  verbose("disk_it %p -> %p\n", (void*) current_ctx, (void*) waiting_ctx);
+  if (current_ctx && waiting_ctx){
+    verbose("give cpu to waiting\n");
+    waiting_ctx->next = current_ctx->next;
+    current_ctx->next = waiting_ctx;
+    waiting_ctx->state = ACTIVABLE;
+    yield();
+    verbose("disk it returned\n");
+  }
+}
 static void
 timer_it() {
-  _out(TIMER_ALARM, 0xFFFFFFFE);
+  _out(TIMER_ALARM, 0xFFFFFFF0);
   yield();
 }
 
@@ -300,7 +314,7 @@ int boot(){
   _out(TIMER_PARAM,128+64); /* reset + alarm on + 8 tick / alarm */
   _out(TIMER_ALARM,0xFFFFFFFD);  /* alarm at next tick (at 0xFFFFFFFF) */
   IRQVECTOR[TIMER_IRQ] = timer_it;
-
+  IRQVECTOR[HDA_IRQ] = disk_it;
   /* We are ready, begin to catch interruptions */
   _mask(1);
   verbose("Binded timer interruptions\n");
