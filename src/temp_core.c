@@ -3,7 +3,6 @@
 
 #include "../include/hardware.h"
 #include "hardware_ini.h"
-#include "commons.h"
 
 #define CORE_CONFIG "core.ini"
 #define HW_CONFIG "core.ini"
@@ -23,21 +22,24 @@ void empty_handler() {
 }
 
 void init_handler() {
-	int i;
 	int core_id = _in(CORE_ID);
+	unsigned int i, j;
+
+	printf("Start core %d...\n", core_id);
 
 	_mask(0x0);
-	printf("begin core %d\n", core_id);
 
 	while(1) {
 
 		printf("Lock core %d\n", core_id);
 
 		while(_in(CORE_LOCK) != 0x1) {
-
+			/*printf("verrou locked\n");*/
 		}
-		for (i=0; i<10; i++)
-			printf(" --> core%d\n",core_id);
+
+		for (j = 0 ; j < 10 ; j++) {
+			printf("--> core%d\n", core_id);
+		}
 
 		_out(CORE_UNLOCK, 0x0);
 		printf("Unlock core %d\n", core_id);
@@ -49,7 +51,7 @@ void timer_handler() {
 
 	printf("Timer IRQ in core %d\n", core_id);
 
-	_out(TIMER_ALARM,0xFFFFFFFF -4);
+	_out(TIMER_ALARM,0xFFFFFFFD);
 }
 
 int main() {
@@ -61,11 +63,11 @@ int main() {
 
 	IRQVECTOR[0] = init_handler;
 	IRQVECTOR[TIMER_IRQ] = timer_handler;
-	_out(TIMER_PARAM,128+64+32+8);
-	_out(TIMER_ALARM,0xFFFFFFFF -4);
+	_out(TIMER_PARAM,128+64);
+	_out(TIMER_ALARM,0xFFFFFFFE);
 
 	_out(CORE_STATUS, 0x3);
-	_out(CORE_IRQMAPPER+0, 1 << TIMER_IRQ);
+	/*_out(CORE_IRQMAPPER+0, 1 << TIMER_IRQ);*/
 	_out(CORE_IRQMAPPER+1, 1 << TIMER_IRQ);
 
 	init_handler();
