@@ -8,10 +8,15 @@
 #define HW_CONFIG "core.ini"
 
 #define CORE_STATUS		0x80
+#define CORE_IRQMAPPER	0x82   
 
 void core(){
 	while(1)
 		printf(" --> core%d\n",_in(0x126));
+}
+
+void interrupt(){
+	printf(" --> interrupt%d\n",_in(0x126));
 }
 
 
@@ -39,8 +44,10 @@ void main(int argc, char** argv){
     /* Allows all IT */
     _mask(1);
     
-    
+    IRQVECTOR[3]=interrupt;
 	IRQVECTOR[0]=core;
 	_out(CORE_STATUS, 0x7);
+	_out(CORE_IRQMAPPER, 0x0);
+	_out(CORE_IRQMAPPER+1, 0x8);
 	core(0);
 }
