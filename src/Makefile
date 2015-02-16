@@ -53,8 +53,8 @@ semtester: semtester.o sem.o commons.o  ctx.o hw.o $(OBJECTS)
 	$(CC) $(CFLAGS) -o $(BINDIR)/$@ $^ $(LIBDIR) $(LIBS)
 shell: shell.o ifile.o $(OBJECTS)
 	$(CC) $(CFLAGS) -lreadline -o $(BINDIR)/$@ $^ $(LIBDIR) $(LIBS)
-
-coretester: coretester.o
+	
+coretester: temp_core.o commons.o
 	$(CC) $(CFLAGS) $(THREAD) -o $(BINDIR)/$@ $^ $(LIBDIR) $(LIBS)
 
 ###------------------------------
@@ -91,6 +91,8 @@ tools.o: tools.c tools.h
 file.o: file.c file.h dir.h ifile.h inode.h tools.h mount.h
 dir.o: dir.c dir.h ifile.h inode.h tools.h mount.h
 shell.o: shell.c ctx.h mount.h builtins.h commons.h
+
+temp_core.o: temp_core.c commons.h
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< $(INCDIR)
