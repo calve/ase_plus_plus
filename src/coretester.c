@@ -44,10 +44,10 @@ void main(int argc, char** argv){
     /* Allows all IT */
     _mask(1);
     
-    IRQVECTOR[3]=interrupt;
+    IRQVECTOR[2]=interrupt;
 	IRQVECTOR[0]=core;
 	_out(CORE_STATUS, 0x7);
 	_out(CORE_IRQMAPPER, 0x0);
-	_out(CORE_IRQMAPPER+1, 0x8);
+	_out(CORE_IRQMAPPER+1, 0x6);
 	core(0);
 }
