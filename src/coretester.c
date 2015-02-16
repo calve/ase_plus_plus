@@ -31,7 +31,7 @@ void main(int argc, char** argv){
 
 	int i;
     /* init hardware */
-    if(init_hardware("etc/core.ini") == 0) 
+    if(init_hardware(CORE_CONFIG) == 0)
     {
 		fprintf(stderr, "Error in hardware initialization\n");
 		exit(EXIT_FAILURE);

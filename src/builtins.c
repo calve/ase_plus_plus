@@ -13,6 +13,7 @@
 COMMAND commands[] = {
   { "cat", do_cat, "Print file FILE" },
   { "cd", do_cd, "Change to directory DIR" },
+  { "clock", do_clock, "Count seconds" },
   { "compute", do_compute, "Compute stuffs DIR" },
   { "cp", do_cp, "cp source dest DIR" },
   { "ed", do_ed, "edit FILE" },
@@ -112,6 +113,14 @@ int do_cd(char* arguments){
     strcpy(cwd, target);
   }
   return 0;
+}
+
+int do_clock(char* arguments){
+  int counter=0;
+  while(1){
+    printf("%d s\n", counter++);
+    second_sleep(1);
+  }
 }
 
 /* A function that do heavy computing used to test contexts */
@@ -244,10 +253,10 @@ int do_ls(char* arguments){
   int entry_lenght;
   int counter = 0;
   char target[MAXPROMPT];
-  char subentries[MAXPATH][MAXPATH];
+  char subentries[16][MAXPATH];
 
   canonical_path(target, arguments);
-  entry_lenght = list_directory(subentries, 1024, target);
+  entry_lenght = list_directory(subentries, 16, target);
 
   while ( counter < entry_lenght){
     printf("%s ",subentries[counter]);

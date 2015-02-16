@@ -251,7 +251,7 @@ void shell_loop(void* arguments) {
 
     /* Read command line */
     cmdline = readline(prompt);
-
+    fflush(stdin);
     if (!cmdline) {    /* End of file (ctrl-d) */
       printf("\n");    /* Give a clean prompt to user */
       break;
@@ -267,7 +267,7 @@ void shell_loop(void* arguments) {
         add_history(cmdline_cpy);
         if (is_background(cmdline_cpy)){
           verbose("Will run ``%s`` in a new context\n", cmdline_cpy + 1);
-          create_ctx(16000, (void*) eval, cmdline_cpy + 1);
+          create_ctx(32768, (void*) eval, cmdline_cpy + 1);
         }
         else {
           eval(cmdline_cpy);

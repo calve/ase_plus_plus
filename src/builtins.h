@@ -13,6 +13,7 @@ typedef struct {
 int do_help(char* arguments);
 int do_cat(char* arguments);
 int do_cd(char* arguments);
+int do_clock(char* arguments);
 int do_compute(char* arguments);
 int do_cp(char* arguments);
 int do_ed(char* arguments);

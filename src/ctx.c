@@ -13,7 +13,24 @@ struct ctx_s *current_ctx = NULL;
 static int first_context = 1;
 
 void switch_to_ctx(struct ctx_s *ctx);
+
 /** Create a context with it's own stack and function
+ * Create a struct to pass multiple arguments.
+ * Example :
+ *  void example() {
+ *      struct {
+ *              int cylinder;
+ *              int sector;
+ *              unsigned char *buffer;
+ *              int size;
+ *
+ *      } arguments;
+ *      arguments.cylinder = ncyl_of_nbloc(vol, nbloc);
+ *      arguments.sector = nsec_of_nbloc(vol, nbloc);
+ *      arguments.buffer = buffer;
+ *      arguments.size = size;
+ *      create_ctx(16000, (void*) read_nsector, (&arguments));
+ * }
  */
 struct ctx_s* create_ctx(int stack_size, func_t function, void *arguments){
   struct ctx_s *ctx;
