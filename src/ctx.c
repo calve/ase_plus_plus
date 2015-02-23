@@ -44,6 +44,8 @@ struct ctx_s* create_ctx(int stack_size, func_t function, void *arguments){
   ctx->esp = (char*) ctx->stack + stack_size;
   ctx->ebp = ctx->esp;
   ctx->canary = CANARY;
+  /* Here we should choose a core depending of the load of each ones
+   */
   /* Keep the list ordered */
   if (current_ctx[current_core] == NULL)
     { /* First context created, initiate the list */
@@ -126,7 +128,6 @@ void yield(){
           iterator = iterator->next;
         }
         if (iterator != current_ctx[current_core]){
-          printf("switch context\n");
           switch_to_ctx(iterator);
         }
       }

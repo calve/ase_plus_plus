@@ -53,7 +53,6 @@ semtester: semtester.o sem.o commons.o  ctx.o hw.o $(OBJECTS)
 	$(CC) $(CFLAGS) -o $(BINDIR)/$@ $^ $(LIBDIR) $(LIBS)
 shell: shell.o ifile.o $(OBJECTS)
 	$(CC) $(CFLAGS) -lreadline -o $(BINDIR)/$@ $^ $(LIBDIR) $(LIBS)
-	
 coretester: temp_core.o commons.o
 	$(CC) $(CFLAGS) $(THREAD) -o $(BINDIR)/$@ $^ $(LIBDIR) $(LIBS)
 
