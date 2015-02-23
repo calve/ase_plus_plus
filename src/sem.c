@@ -1,5 +1,7 @@
 #include "ctx.h"
 #include "sem.h"
+#include "../include/hardware.h"
+#include "hardware_ini.h"
 
 /* ====================== Semaphore ====================== */
 
@@ -14,6 +16,7 @@ void sem_init(struct sem_s *sem, unsigned int val)
 /* Fonction wait des semaphores */
 void sem_down(struct sem_s *sem)
 {
+  int core = _in(CORE_ID);
   assert(sem->sem_magic_number==SEM_MAGIC_NUMBER);
   if (sem->sem_compteur > 0)
   {
@@ -23,9 +26,9 @@ void sem_down(struct sem_s *sem)
   }
   else {
     /* Cannot take the semaphore now, give time to another process */
-    current_ctx[current_core]->state = BLOCKED;
-    current_ctx[current_core]->next_semaphore_context = sem->sem_ctx_blocked;
-    sem->sem_ctx_blocked = current_ctx[current_core];
+    current_ctx[core]->state = BLOCKED;
+    current_ctx[core]->next_semaphore_context = sem->sem_ctx_blocked;
+    sem->sem_ctx_blocked = current_ctx[core];
     yield();
     return;
   }

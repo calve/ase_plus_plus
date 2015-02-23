@@ -11,7 +11,7 @@
 
 struct ctx_s *current_ctx[MAX_CORE] = {NULL};
 static int first_context = 1;
-static int current_core = 0;
+int current_core = 0;
 
 void switch_to_ctx(struct ctx_s *ctx);
 
