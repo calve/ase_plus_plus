@@ -322,8 +322,8 @@ int main(int argc, char** argv){
 
   boot();
   verbose("Boot successfull\n");
-  mount_volume(0);
-  verbose("Volume 0 has been automatically mounted. Use ``mount`` to mount another\n");
+  /* mount_volume(0); */
+  /* verbose("Volume 0 has been automatically mounted. Use ``mount`` to mount another\n"); */
   initialize_readline ();    /* Bind our completer. */
   printf("Welcome in shell. Build date %s %s\n", __DATE__, __TIME__);
   printf("Type ``help`` to find out all the available commands in this shell\n");
