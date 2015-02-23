@@ -6,6 +6,7 @@
 #include "dir.h"
 #include "mount.h"
 #include "inode.h"              /* Needed for file_type_e */
+#include "ctx.h"
 #include "builtins.h"
 
 /* The list of available command name, the function they call, and an inline help
@@ -22,6 +23,7 @@ COMMAND commands[] = {
   { "ls", do_ls, "Synonym for `list'" },
   { "mkdir", do_mkdir, "Make a directory" },
   { "mount", do_mount, "Mount a volume" },
+  { "ps", do_ps, "List processes" },
   { "rm", do_rm, "Remove a volume" },
   { "exit", do_exit, "Quit" },
   { (char *)0, (void *)0, (char *)0 }
@@ -284,6 +286,20 @@ int do_mount(char* arguments){
   int volume;
   sscanf(arguments, "%i", &volume);
   mount_volume(volume);
+  return 0;
+}
+
+int do_ps(char* arguments){
+  for (int i=0; i<MAX_CORE; i++){
+      printf("core %i\n", i);
+      if (current_ctx[i] != NULL){
+        struct ctx_s *iterator = current_ctx[i]->next;
+        while (iterator != current_ctx[i]){
+          printf("    %p\n", iterator);
+          iterator = iterator->next;
+        }
+      }
+  }
   return 0;
 }
 
