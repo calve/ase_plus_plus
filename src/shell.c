@@ -287,7 +287,7 @@ int boot(){
   int status, i;
 
   /* Hardware initialization */
-  hw_config = "hardware.ini";
+  hw_config = "core.ini";
   status = init_hardware(hw_config);
   if (status == 0){
     printf("error in hardware initialization with %s\n", hw_config);
@@ -297,9 +297,12 @@ int boot(){
   /* Interrupt handlers */
   for(i=0; i<16; i++)
     IRQVECTOR[i] = empty_it;
-  _out(TIMER_PARAM,128+64); /* reset + alarm on + 8 tick / alarm */
+  _out(TIMER_PARAM,128+64);      /* reset + alarm on + 8 tick / alarm */
   _out(TIMER_ALARM,0xFFFFFFFD);  /* alarm at next tick (at 0xFFFFFFFF) */
   IRQVECTOR[TIMER_IRQ] = timer_it;
+  _out(CORE_STATUS, 0x1);        /* Useless since core 0 is currently running,
+                                    but this is not harmfull */
+  _out(CORE_IRQMAPPER, 1<< TIMER_IRQ | 1 << HDA_IRQ);
 
   /* We are ready, begin to catch interruptions */
   _mask(1);
