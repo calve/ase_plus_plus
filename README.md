@@ -97,6 +97,7 @@ Exemple d'utilisation du shell ``./bin/shell``
 
 # Todo
 
+  + **fix second_sleep**
   + builtin ``ps`` : liste les contextes sur chaques coeurs
   + klock() /* bloque tant que pas de verrou */
   + kunlock()
