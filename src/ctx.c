@@ -9,8 +9,9 @@
 /* Use this constant to verify integrity of contexts */
 #define CANARY 0xCAFEBABE
 
-struct ctx_s *current_ctx = NULL;
+struct ctx_s *current_ctx[MAX_CORE] = {NULL};
 static int first_context = 1;
+static int current_core = 0;
 
 void switch_to_ctx(struct ctx_s *ctx);
 
@@ -44,37 +45,37 @@ struct ctx_s* create_ctx(int stack_size, func_t function, void *arguments){
   ctx->ebp = ctx->esp;
   ctx->canary = CANARY;
   /* Keep the list ordered */
-  if (current_ctx == NULL)
+  if (current_ctx[current_core] == NULL)
     { /* First context created, initiate the list */
       ctx->next = ctx;
-      current_ctx = ctx;
+      current_ctx[current_core] = ctx;
     }
   else
     {
-      ctx->next = current_ctx->next;
-      current_ctx->next = ctx;
+      ctx->next = current_ctx[current_core]->next;
+      current_ctx[current_core]->next = ctx;
     }
   return ctx;
 }
 
 /** Delete the current context
- * We should use a temporary stack in this procedure, so that there would be no problem when free(current_ctx->stack)
+ * We should use a temporary stack in this procedure, so that there would be no problem when free(current_ctx[current_core]->stack)
  */
 void delete_ctx(){
-  struct ctx_s* iterator = current_ctx;
-  void* stack = current_ctx->stack;
+  struct ctx_s* iterator = current_ctx[current_core];
+  void* stack = current_ctx[current_core]->stack;
 
   /* Found which context previous the current context */
-  while (iterator->next != current_ctx){
+  while (iterator->next != current_ctx[current_core]){
     iterator = iterator->next;
   }
-  if (current_ctx == current_ctx->next){
+  if (current_ctx[current_core] == current_ctx[current_core]->next){
     fprintf(stderr,"\nno more context, terminating\n");
     exit(0);
   }
-  iterator->next = current_ctx->next;
-  /* at this point, current_ctx is not in the linked list anymore */
-  free(current_ctx);
+  iterator->next = current_ctx[current_core]->next;
+  /* at this point, current_ctx[current_core] is not in the linked list anymore */
+  free(current_ctx[current_core]);
   free(stack);
 }
 
@@ -83,47 +84,51 @@ void delete_ctx(){
 void switch_to_ctx (struct ctx_s *ctx){
   irq_disable();
   assert(ctx);
-  if (current_ctx){
+  if (current_ctx[current_core]){
     asm("movl %%esp, %0"
-        :"=r" (current_ctx->esp));
+        :"=r" (current_ctx[current_core]->esp));
     asm("movl %%ebp, %0"
-        :"=r" (current_ctx->ebp));
+        :"=r" (current_ctx[current_core]->ebp));
   }
   assert(ctx->canary == CANARY);
   assert(ctx->state != BLOCKED);
-  current_ctx = ctx;
+  current_ctx[current_core] = ctx;
   asm("movl %0, %%esp"
       :
-      :"r" (current_ctx->esp));
+      :"r" (current_ctx[current_core]->esp));
   asm("movl %0, %%ebp"
       :
-      :"r" (current_ctx->ebp));
-  if (current_ctx->state == ACTIVABLE){
-    current_ctx->state = READY;
+      :"r" (current_ctx[current_core]->ebp));
+  if (current_ctx[current_core]->state == ACTIVABLE){
+    current_ctx[current_core]->state = READY;
     irq_enable();   /* can reenable an inq_disable from sem_down */
-    current_ctx->function(current_ctx->arguments);
-    /* Hey, function returned, we may remove current_ctx from the list */
-    current_ctx->state = TERMINATED;
+    current_ctx[current_core]->function(current_ctx[current_core]->arguments);
+    /* Hey, function returned, we may remove current_ctx[current_core] from the list */
+    current_ctx[current_core]->state = TERMINATED;
     delete_ctx();
     yield();
   }
+  irq_enable();   /* can reenable an inq_disable from sem_down */
 }
 
 
 void yield(){
-  if (current_ctx){
+  if (current_ctx[current_core]){
     if (first_context == 1)
       {
         first_context = 0;
-        switch_to_ctx(current_ctx);
+        switch_to_ctx(current_ctx[current_core]);
       }
     else
       {
-        struct ctx_s *iterator = current_ctx->next;
+        struct ctx_s *iterator = current_ctx[current_core]->next;
         while (iterator->state == BLOCKED){
           iterator = iterator->next;
         }
-        switch_to_ctx(iterator);
+        if (iterator != current_ctx[current_core]){
+          printf("switch context\n");
+          switch_to_ctx(iterator);
+        }
       }
   }
 }

@@ -9,6 +9,7 @@
 #define TIMER_CLOCK     0xF0
 #define TIMER_PARAM     0xF4
 #define TIMER_IRQ       2
-#define CORE_STATUS	0x80
-#define CORE_IRQMAPPER	0x82
+#define CORE_STATUS     0x80
+#define CORE_IRQMAPPER  0x82
+#define MAX_CORE        16
 

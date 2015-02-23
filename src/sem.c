@@ -23,9 +23,9 @@ void sem_down(struct sem_s *sem)
   }
   else {
     /* Cannot take the semaphore now, give time to another process */
-    current_ctx->state = BLOCKED;
-    current_ctx->next_semaphore_context = sem->sem_ctx_blocked;
-    sem->sem_ctx_blocked = current_ctx;
+    current_ctx[current_core]->state = BLOCKED;
+    current_ctx[current_core]->next_semaphore_context = sem->sem_ctx_blocked;
+    sem->sem_ctx_blocked = current_ctx[current_core];
     yield();
     return;
   }

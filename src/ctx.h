@@ -1,5 +1,6 @@
 #ifndef __ctx_h__
 #define __ctx_h__
+#include "hardware_ini.h"
 
 typedef void (func_t) (void*);
 
@@ -30,6 +31,7 @@ typedef struct ctx_s {
 void yield();
 struct ctx_s* create_ctx(int stack_size, func_t function, void *arguments);
 void delete_ctx();
-struct ctx_s *current_ctx;
+struct ctx_s *current_ctx[MAX_CORE];
+int current_core;
 
 #endif
