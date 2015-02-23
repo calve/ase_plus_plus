@@ -300,12 +300,12 @@ int boot(){
   _out(TIMER_PARAM,128+64);      /* reset + alarm on + 8 tick / alarm */
   _out(TIMER_ALARM,0xFFFFFFFD);  /* alarm at next tick (at 0xFFFFFFFF) */
   IRQVECTOR[TIMER_IRQ] = timer_it;
-  _out(CORE_STATUS, 0x1);        /* Useless since core 0 is currently running,
-                                    but this is not harmfull */
-  _out(CORE_IRQMAPPER, 1<< TIMER_IRQ | 1 << HDA_IRQ);
+  _out(CORE_STATUS, 0x3);        /* Enable cores 0 and 1 */
+  _out(CORE_IRQMAPPER, (1 << TIMER_IRQ) | (1 << HDA_IRQ));
+  _out(CORE_IRQMAPPER+1, (1 << TIMER_IRQ) | (1 << HDA_IRQ));
 
   /* We are ready, begin to catch interruptions */
-  _mask(1);
+  _mask(0);
   verbose("Binded timer interruptions\n");
 
   return 0;
