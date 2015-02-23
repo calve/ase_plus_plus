@@ -293,11 +293,11 @@ int do_ps(char* arguments){
   for (int i=0; i<MAX_CORE; i++){
       printf("core %i\n", i);
       if (current_ctx[i] != NULL){
-        struct ctx_s *iterator = current_ctx[i]->next;
-        while (iterator != current_ctx[i]){
+        struct ctx_s *iterator = current_ctx[i];
+        do {
           printf("    %p\n", iterator);
           iterator = iterator->next;
-        }
+        } while (iterator != current_ctx[i]);
       }
   }
   return 0;
