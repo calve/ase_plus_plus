@@ -25,6 +25,7 @@ COMMAND commands[] = {
   { "mount", do_mount, "Mount a volume" },
   { "ps", do_ps, "List processes" },
   { "rm", do_rm, "Remove a volume" },
+  { "sleep", do_sleep, "Sleep for x seconds" },
   { "exit", do_exit, "Quit" },
   { (char *)0, (void *)0, (char *)0 }
 };
@@ -313,4 +314,10 @@ int do_rm(char* arguments){
     printf("Error removing %s\n", target);
   }
   return 0;
+}
+
+int do_sleep(char* arguments){
+  int time;
+  sscanf(arguments, "%i", &time);
+  second_sleep(time);
 }

@@ -23,6 +23,7 @@ int do_mkdir(char* arguments);
 int do_mount(char* arguments);
 int do_ps(char* arguments);
 int do_rm(char* arguments);
+int do_sleep(char* arguments);
 
 extern COMMAND commands[];
 
