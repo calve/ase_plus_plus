@@ -97,7 +97,10 @@ Exemple d'utilisation du shell ``./bin/shell``
 
 # Todo
 
-+ procédure ``boot()``
-+ voir sceance4.md
+  + builtin ``ps`` : liste les contextes sur chaques coeurs
+  + klock() /* bloque tant que pas de verrou */
+  + kunlock()
+  + ktailblock()
+  + intégrer CORE_LOCK
 
 # BUGS
