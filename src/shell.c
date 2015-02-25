@@ -158,18 +158,6 @@ timer_it() {
   yield();
 }
 
-
-/* Test if this command line should invoque command
- * examples :
- * is_command("mkdir plop plop", "mkdir") -> true
- * is_command("mkdir", "mkdir") -> true
- * is_command("mk dir", "mkdir") -> false
- */
-int is_command(char* command_line, char* command){
-  return strncmp(command_line, command, strlen(command));
-}
-
-
 /* Returns a pointer to the first argument of a command line
  */
 char* get_arguments(char* command_line){
