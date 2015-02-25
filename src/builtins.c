@@ -320,4 +320,5 @@ int do_sleep(char* arguments){
   int time;
   sscanf(arguments, "%i", &time);
   second_sleep(time);
+  return 0;
 }
