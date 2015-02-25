@@ -21,5 +21,4 @@ extern char cwd[MAXPROMPT]; /* Maybe it should not be global ... */
  */
 void canonical_path(char* canonical, char* path);
 
-void second_sleep(int second);
 #endif
