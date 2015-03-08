@@ -136,7 +136,7 @@ void yield(){
 
 
 /* Sleep for at least ``seconds`` seconds
- * At the moment, counting using TIMER_CLOCK seems buggy, so we just count to 2^30 ``seconds`` times
+ * At the moment, counting using TIMER_CLOCK seems buggy, so we just count to 2^28 ``seconds`` times
  */
 void second_sleep(int seconds){
   /* Wait for i seconds */
@@ -144,7 +144,7 @@ void second_sleep(int seconds){
     int count = 0;
     while (1){
       count++;
-      if (count > 1<<30)
+      if (count > 1<<28)
         break;
     }
   }
