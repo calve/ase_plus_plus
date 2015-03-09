@@ -11,12 +11,11 @@
 
 #define CORE_STATUS		0x80
 #define CORE_IRQMAPPER	0x82
-#define NUM_CORE		0x126
 
 void core(){
     while(1){
         /*second_sleep(2);*/
-        printf(" --> core%d\n",_in(NUM_CORE));
+        printf(" --> core%d\n",_in(CORE_ID));
     }
 }
 
@@ -29,7 +28,7 @@ empty_it()
 
 static void
 timer_it() {
-    printf(" --> interrupt%d\n",_in(NUM_CORE));
+    printf(" --> interrupt%d\n",_in(CORE_ID));
     _out(TIMER_ALARM, 0xFFFFFFFD);
 }
 
