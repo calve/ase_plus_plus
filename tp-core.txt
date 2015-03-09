@@ -1,0 +1,130 @@
+%% $Id: tp-core.txt 202 2015-02-25 19:01:39Z phm $
+%%------------------------------
+%%
+%% Bref descriptif des TP ASE++
+%% Aspects multicore
+%%
+%%------------------------------------------------------------
+
+------------------------------
+ 1er TP - Prise en main
+------------------------------------------------------------
+
+Mise à disposition de la version multicore de la librairie
+- dans /home/enseigne/ASE/core
+- dans www.lifl.fr/~marquet/ens/hw/releases/*core*
+
+La documentation des fonctionnalités multicore est décrite à la fin du
+fichier core.ini
+
+L'objectif de ce 1er TP est de réaliser trois programmes :
+
+1- exemple basic d'utilisation du multicore
+
+    6 cores
+    chaque core, en boucle
+        - affiche [<idcore>]
+        - compte jusque 2^30
+
+2- utilisation de timer
+
+    en plus du programme précédent
+    on initialise l'alarme (TIMER_PARM et TIMER_ALARM)
+    les core de rang impair associe un handler à TIMER_IRQ
+    ce handler réinitialise TIMER_ALARM
+    ce handler affiche aussi un petit message de trace
+
+3- utilisation du lock
+
+    en plus du programme précédent
+    la boucle infinie exécutée par chacun des core
+        - tente de prendre le verrou (attente active)
+        - affiche [<idcore>
+        - compte jusque 2^20
+        - affiche -[idcore>]
+        - relâche le verrou
+        - (compte jusque... pour ne pas reprendre le verrou de suite)
+
+    On ne doit donc pas avoir d'affichage [i-j] avec i différent de j.
+
+
+------------------------------
+ 2e TP - Gestion de contextes en multicore
+------------------------------------------------------------
+
+Au delà de l'objectif, une première version peut, à partir de
+premières versions de gestion de contextes développées en ASE :
+
+- définir autant de listes de contextes que de cores
+- sur le core #0, créer initialement une série de contextes pour
+  nourrir toutes ces listes
+- démarrer les autres cores et les interruptions pour passer la main
+  aux différents contextes. La fonction de démarrage des cores boucle
+  à l'infinie, elle sera interrompue par les interruptions
+- ensuite, les éventuelles créations de contexte sur le core courant
+  se fait dans la liste des contextes associée au core
+
+Ainsi, aucun conflit d'accès au différentes listes ne peut
+survenir. L'utilisation de verrous n'st donc pas nécessaire.
+
+D'autres pistes à base d'une unique liste de contextes sont aussi
+possibles.
+
+Validation progressive :
+    1- création initiale de contextes uniquement
+    2- création dynamique (donc locale) de contextes
+    3- terminaison locale (retour à la fonction init() de boot des cores)
+
+------------------------------
+ 3e TP - Partage de structures du noyau
+------------------------------------------------------------
+
+1- Bibliothèque de gestion d'un unique verrou klock
+
+klock = k pour kernel.
+Implémentation via les registres CORE_LOCK et CORE_UNLOCK par attente
+active.
+
+2- Utilisation basique de klock.
+
+(On peut passer cette étape)
+
+Par exemple autoriser (implémenter) la création de contextes de
+manière circulante (roundrobin) sur les différents cores (donc les
+différentes listes), et pas nécessairement sur le core courant.
+
+L'accès aux listes est alors partagé et nécessite la prise de verrou.
+
+3- Équilibre de la charge
+
+Lors du retour à la fonction init(), un core (qui n'a donc plus de
+contextes locaux) tente de voler de la charge au core le plus chargé.
+(Par exemple voler la moitié des contextes que ce cor ele plus chargé
+détient, on peut faire plus simple et ne voler qu'un contexte).
+
+Attention à ne pas voler le contexte en cours d'exécution sur un
+core.
+
+Validation minimale par le scénario suivant :
+
+- création locale de contexte
+- un shell et des commandes/contextes
+    - des commandes qui calculent.. et terminent
+    - des comandes qui calculent et ne terminent pas
+    - une commande ps qui liste des contexte (et la charge des cores)
+- le shell est lancé, il va ne créer des contextes que sur le core
+  sur lequel il s'exécute.
+- les autres cores, qui n'ont pas de contextes à exécuter vont venir
+  voler des contextes à ce premier core
+- on doit observer un équilibre d ela charge
+
+%%------------------------------
+%% eof
+%%------------------------------------------------------------
+%%
+%% Local Variables:
+%% mode: text
+%% mode: flyspell
+%% ispell-local-dictionary: "fr"
+%% ispell-local-pdict: "~/.ispell_francais"
+%% End:
