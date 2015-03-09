@@ -12,7 +12,6 @@ sémaphore : appel depuis un ctx. Ca peut etre bloquant et si c'est le cas, on p
 
 Ce 2eme choix n'a de sens que sur du multicore
 
-# RENDU 
-
+# RENDU sur prof pour le lundi 23
 Pour chaque séance, on explique que qu'on a fait, ce qui ne marche pas.
 exgalement fournir des exmples a executer : expliquer ce qui est attendu et ce que l'on observe
