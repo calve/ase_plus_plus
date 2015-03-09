@@ -154,7 +154,7 @@ static void empty_it(){ return; }
 
 static void
 timer_it() {
-  _out(TIMER_ALARM, 0xFFFFFFFE);
+  _out(TIMER_ALARM, 0xFFFFFFFF - 100); /* Let time pass between interruptions */
   yield();
 }
 
