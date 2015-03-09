@@ -136,17 +136,18 @@ void yield(){
 
 
 /* Sleep for at least ``seconds`` seconds
- * At the moment, counting using TIMER_CLOCK seems buggy, so we just count to 2^28 ``seconds`` times
  */
 void second_sleep(int seconds){
   /* Wait for i seconds */
-  for (int i = 0; i < seconds; i++){
-    int count = 0;
-    while (1){
-      count++;
-      if (count > 1<<28)
-        break;
+  int old_time;
+  static int retain;
+  old_time = _in(TIMER_CLOCK);
+  retain = old_time;
+  while (_in(TIMER_CLOCK) < old_time+seconds*1000){
+    if (retain != _in(TIMER_CLOCK)){
+      printf("compare %i and %i\n", _in(TIMER_CLOCK), old_time+seconds*1000);
+      retain = _in(TIMER_CLOCK);
     }
+    yield();
   }
-  return;
 }
