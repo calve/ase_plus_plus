@@ -6,11 +6,11 @@ ROOTDIR=../
 CC	= gcc
 CFLAGS	= -Wall -ansi
 CFLAGS  +=  -std=gnu99
-CFLAGS  += -g -m32 -lpthread
+CFLAGS  += -g -m32
 BINDIR = $(ROOTDIR)/bin
 LIBDIR  = -L$(ROOTDIR)/lib
 INCDIR  = -I$(ROOTDIR)/include
-LIBS    = -lhardware -lreadline
+LIBS    = -lhardware -lreadline -lpthread
 #THREAD	= -lpthread
 
 ###------------------------------
