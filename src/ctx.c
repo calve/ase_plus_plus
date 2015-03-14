@@ -33,10 +33,11 @@ void switch_to_ctx(struct ctx_s *ctx);
  *      create_ctx(16000, (void*) read_nsector, (&arguments));
  * }
  */
-struct ctx_s* create_ctx(int stack_size, func_t function, void *arguments){
+struct ctx_s* create_ctx(int stack_size, func_t function, void *arguments, char* cmd){
   struct ctx_s *ctx;
   ctx = malloc(sizeof(struct ctx_s));
   ctx->state = ACTIVABLE;
+  ctx->cmd = cmd;
   ctx->function = function;
   ctx->arguments = arguments;
   ctx->stack = malloc(stack_size);
@@ -145,7 +146,9 @@ void second_sleep(int seconds){
   retain = old_time;
   while (_in(TIMER_CLOCK) < old_time+seconds*1000){
     if (retain != _in(TIMER_CLOCK)){
+      /*
       printf("compare %i and %i\n", _in(TIMER_CLOCK), old_time+seconds*1000);
+      */
       retain = _in(TIMER_CLOCK);
     }
     yield();

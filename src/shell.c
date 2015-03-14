@@ -255,7 +255,7 @@ void shell_loop(void* arguments) {
         add_history(cmdline_cpy);
         if (is_background(cmdline_cpy)){
           verbose("Will run ``%s`` in a new context\n", cmdline_cpy + 1);
-          create_ctx(32768, (void*) eval, cmdline_cpy + 1);
+          create_ctx(32768, (void*) eval, cmdline_cpy + 1, cmdline_cpy);
         }
         else {
           eval(cmdline_cpy);
@@ -278,7 +278,7 @@ void setup_shell(){
   printf("Type ``help`` to find out all the available commands in this shell\n");
   printf("Add ``&`` in front of a command to run it in a new context (in background)\n");
   printf("\n");
-  create_ctx(16000, shell_loop, NULL);
+  create_ctx(16000, shell_loop, NULL, "shell loop");
   yield();
 }
 

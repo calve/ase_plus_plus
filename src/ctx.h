@@ -24,12 +24,13 @@ typedef struct ctx_s {
   void *ebp;
   void *esp;
   void *stack;
+  char* cmd;
 } ctx_t;
 
 
 /* Some functions we will need */
 void yield();
-struct ctx_s* create_ctx(int stack_size, func_t function, void *arguments);
+struct ctx_s* create_ctx(int stack_size, func_t function, void *arguments, char* cmd);
 void delete_ctx();
 struct ctx_s *current_ctx[MAX_CORE];
 void second_sleep(int second);
