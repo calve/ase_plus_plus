@@ -105,10 +105,10 @@ int main(){
   sem_init(&mutex, 1);
   sem_init(&fill_count, 0);
   sem_init(&empty_count, MAX_BUFFER);
-  create_ctx(16000, (void*) consummerD, (void*) NULL);
-  create_ctx(16000, (void*) consummerC, (void*) NULL);
-  create_ctx(16000, (void*) producerA, (void*) NULL);
-  create_ctx(16000, (void*) producerB, (void*) NULL);
+  create_ctx(16000, (void*) consummerD, (void*) NULL, "consummerD");
+  create_ctx(16000, (void*) consummerC, (void*) NULL, "consummerC");
+  create_ctx(16000, (void*) producerA, (void*) NULL, "producerA");
+  create_ctx(16000, (void*) producerB, (void*) NULL, "producerB");
   yield();
   printf("hello world");
 }

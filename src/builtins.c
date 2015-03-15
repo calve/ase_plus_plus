@@ -296,7 +296,7 @@ int do_ps(char* arguments){
       if (current_ctx[i] != NULL){
         struct ctx_s *iterator = current_ctx[i];
         do {
-          printf("    %p\n", iterator);
+          printf("    %s\n", iterator->cmd);
           iterator = iterator->next;
         } while (iterator != current_ctx[i]);
       }
