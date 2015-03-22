@@ -11,7 +11,7 @@
 
 struct ctx_s *current_ctx[MAX_CORE] = {NULL};
 static int first_context = 1;
-int current_core = 0;
+int current_core = 1;
 
 void switch_to_ctx(struct ctx_s *ctx);
 
@@ -47,6 +47,8 @@ struct ctx_s* create_ctx(int stack_size, func_t function, void *arguments, char*
   ctx->canary = CANARY;
   /* Here we should choose a core depending of the load of each ones
    */
+  /* At the moment, we just read the running core id */
+  current_core = _in(CORE_ID);
   /* Keep the list ordered */
   if (current_ctx[current_core] == NULL)
     { /* First context created, initiate the list */

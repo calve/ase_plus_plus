@@ -254,7 +254,7 @@ void shell_loop(void* arguments) {
 
         add_history(cmdline_cpy);
         if (is_background(cmdline_cpy)){
-          verbose("Will run ``%s`` in a new context\n", cmdline_cpy + 1);
+          verbose("Will run ``%s`` in a new context on core %d\n", cmdline_cpy + 1, _in(CORE_ID));
           create_ctx(32768, (void*) eval, cmdline_cpy + 1, cmdline_cpy);
         }
         else {
@@ -277,24 +277,41 @@ void setup_shell(){
   printf("Welcome in shell. Build date %s %s\n", __DATE__, __TIME__);
   printf("Type ``help`` to find out all the available commands in this shell\n");
   printf("Add ``&`` in front of a command to run it in a new context (in background)\n");
+  printf("Shell initiated on core %d\n", _in(CORE_ID));
   printf("\n");
   create_ctx(16000, shell_loop, NULL, "shell loop");
   yield();
 }
 
+/* A function used as a context for doing nothing
+ */
+void nop_core(){
+  while(1){
+    verbose("main core %d context still here\n", _in(CORE_ID));
+    /* nop */
+  }
+}
+
+/* Start one core, creating a empty context
+ */
+void start_core_up(){
+  printf("Core %d started\n", _in(CORE_ID));
+  create_ctx(4096, nop_core, NULL);
+  printf("Core %d ended\n", _in(CORE_ID));
+}
 
 /* Set the cores up, and then do an endless loop waiting to get interrupted
  */
 void setup_cores(){
-  _out(CORE_STATUS, 0x3);        /* Enable cores 0 and 1 */
-  _out(CORE_IRQMAPPER, (1 << TIMER_IRQ) | (1 << HDA_IRQ));
+  IRQVECTOR[0] = start_core_up;
+  _out(CORE_STATUS, 0x7);        /* Enable cores 0, 1, 2 and 3 */
+  _out(CORE_IRQMAPPER+0, (1 << TIMER_IRQ) | (1 << HDA_IRQ));
   _out(CORE_IRQMAPPER+1, (1 << TIMER_IRQ) | (1 << HDA_IRQ));
+  _out(CORE_IRQMAPPER+2, (1 << TIMER_IRQ) | (1 << HDA_IRQ));
+  _out(CORE_IRQMAPPER+3, (1 << TIMER_IRQ) | (1 << HDA_IRQ));
   /* We are ready, begin to catch interruptions */
   _mask(0);
   setup_shell();
-  while(1){
-    /* nop */
-  }
 }
 
 /* Set up hardware configuration
@@ -337,7 +354,6 @@ int main(int argc, char** argv){
   verbose("Boot successfull\n");
   /* mount_volume(0); */
   /* verbose("Volume 0 has been automatically mounted. Use ``mount`` to mount another\n"); */
-
 
   umount();
   fflush(stdout);
