@@ -1,6 +1,9 @@
 A de Busschere
 K Franquenouille
 
+# Github
+  [https://github.com/calve/ase_plus_plus](https://github.com/calve/ase_plus_plus)
+
 # Structure
 
     |
@@ -95,10 +98,14 @@ Exemple d'utilisation du shell ``./bin/shell``
     $ CURRENT_VOLUME=0 ./bin/if_pfile "/monfichier"
     Le texte de mon fichier
 
-# Todo
+# Rendu 2
 
-  + **fix second_sleep**
-  + builtin ``ps`` : liste les contextes sur chaques coeurs
+## Réussi 
+  + gestion du multicore et des processus sur plusieurs cores.
+  + affichage du nom des processus sur chaque coeur avec la commande ``ps``
+  + core 0 actif pour le shell
+
+## Non fait 
   + klock() /* bloque tant que pas de verrou */
   + kunlock()
   + ktailblock()
