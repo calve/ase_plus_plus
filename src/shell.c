@@ -296,7 +296,7 @@ void nop_core(){
  */
 void start_core_up(){
   printf("Core %d started\n", _in(CORE_ID));
-  create_ctx(4096, nop_core, NULL);
+  create_ctx(4096, nop_core, NULL, "");
   printf("Core %d ended\n", _in(CORE_ID));
 }
 
