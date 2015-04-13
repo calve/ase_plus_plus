@@ -12,6 +12,14 @@
 static char asecmd_buffer[ASE_BUFFER_LEN];
 struct proc_dir_entry *ase_parent, *asecmd_entry;
 
+/**
+ *
+ * TODO : Inspect the running command with the structure called ``struct_task``
+ * See the file sched.h
+ * http://lxr.free-electrons.com/source/include/linux/sched.h
+ *
+ */
+
 
 static void asepid_proc_create(int pid);
 static const struct file_operations asepid_proc_fops;
