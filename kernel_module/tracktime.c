@@ -17,6 +17,7 @@ struct proc_dir_entry *ase_parent, *asecmd_entry;
  * TODO : Inspect the running command with the structure called ``struct_task``
  * See the file sched.h
  * http://lxr.free-electrons.com/source/include/linux/sched.h
+ * http://www.tldp.org/LDP/tlk/ds/ds.html
  *
  */
 
