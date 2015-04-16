@@ -24,6 +24,7 @@ long current_pid;
 
 static int pid_count = 0;
 static struct pid *pid_array[MAX_PID];
+static char asecmd_buffer[ASE_BUFFER_LEN];
 
 static const struct file_operations asepid_proc_fops;
 
@@ -34,29 +35,69 @@ struct proc_dir_entry *ase_parent, *asecmd_entry;
  */
 static int asepid_proc_open(struct inode *inode, struct file *file);
 static int asepid_proc_show(struct seq_file *m, void *v);
-static int init_track_pid(struct file *file, const char *data, size_t size, loff_t *offset);
+static ssize_t asepid_proc_write(struct file *filp, const char __user *buff, size_t len, loff_t *data);
+static void asepid_action(long pid);
 
-static const struct file_operations asepid_proc_fops = {
-    .owner      = THIS_MODULE,
-    .open       = asepid_proc_open,
-    .read       = seq_read
-/*    .write      = asepid_proc_write,
-    .llseek     = seq_lseek,
-    .release    = single_release,*/
-};
+
+/**
+ * Manage ``proc/ase_cmd`` file
+ */
+
+static int
+asecmd_proc_show(struct seq_file *m, void *v)
+{
+    return 0;
+}
+
+
+static int
+asecmd_proc_open(struct inode *inode, struct file *file)
+{
+    /* What to do when user opens ``ase_cmd`` */
+    return single_open(file, asecmd_proc_show, NULL);
+}
+
+static ssize_t
+asecmd_proc_write(struct file *filp, const char __user *buff,
+               size_t len, loff_t *data)
+{
+    /* What to do when user writes to ``ase_cmd`` */
+    long res;
+    printk(KERN_INFO "ASECMD: Write has been called");
+    if (len > (ASE_BUFFER_LEN - 1)) {
+        printk(KERN_INFO "ASECMD: error, input too long");
+        return -EINVAL;
+    }
+    else if (copy_from_user(asecmd_buffer, buff, len)) {
+        return -2;
+    }
+    asecmd_buffer[len] = 0;
+    switch(kstrtol(asecmd_buffer, 0, &res)){
+    case -ERANGE:
+        printk(KERN_EMERG "ASECMD_ERROR: Overflow during conversion.\n");
+        return -1;
+    case -EINVAL:
+        printk(KERN_EMERG "ASECMD_ERROR: Impossible to convert a string to a long\n");
+        return -1;
+    }
+    asepid_action(res);
+    return len;
+}
+
 
 static const struct file_operations asecmd_proc_fops = {
     .owner      = THIS_MODULE,
-    .write      = init_track_pid
-/*    .open       = asecmd_proc_open,
+    .open       = asecmd_proc_open,
     .read       = seq_read,
+    .write      = asecmd_proc_write,
     .llseek     = seq_lseek,
-    .release    = single_release,*/
+    .release    = single_release,
 };
 
 /**
  * Now manage files under ``proc/ase/{pid}``
  */
+
 
 struct asepid_pid {
     unsigned long long start_time;
@@ -72,6 +113,14 @@ static int asepid_proc_show(struct seq_file *m, void *v)
     return 0;
 }
 
+static ssize_t
+asepid_proc_write(struct file *filp, const char __user *buff,
+               size_t len, loff_t *data)
+{
+    /* What to do when user writes to ``ase/{pid}`` */
+    printk(KERN_INFO "ASEPID: Write has been called");
+    return len;
+}
 
 static int asepid_proc_open(struct inode *inode, struct file *file)
 {
@@ -88,24 +137,27 @@ static int asepid_proc_open(struct inode *inode, struct file *file)
     return single_open(file, asepid_proc_show, NULL);
 }
 
+
+static const struct file_operations asepid_proc_fops = {
+    .owner      = THIS_MODULE,
+    .open       = asepid_proc_open,
+    .read       = seq_read,
+    .write      = asepid_proc_write,
+    .llseek     = seq_lseek,
+    .release    = single_release,
+};
+
 /**
  * Manage the tracking of the PID
  */
-static void asepid_action(const char *pid_str){
-    long pid;
+static void asepid_action(long pid){
     int i;
     struct pid *pid_struct;
 
     printk(KERN_EMERG "ASECMD: Entering the add_pid_action function.\n");
-    switch(kstrtol(pid_str, 10, &pid)){
-    case -ERANGE:
-        printk(KERN_EMERG "ASECMD_ERROR: Overflow during conversion.\n");
-        return ;
-    case -EINVAL:
-        printk(KERN_EMERG "ASECMD_ERROR: Impossible to convert a string to a long\n");
-        return ;
-    }
     if((pid_struct = find_get_pid(pid)) != NULL){
+        char* pid_buffer;
+        pid_buffer=kmalloc(sizeof(char) * 10, GFP_KERNEL); /* Pid should not be must than 10 digits long, ie 1^10 */
         printk(KERN_EMERG "ASECMD: PID find and added in the directory\n");
 
         /* On vérifie que le fichier n'existe pas avant de le créer. */
@@ -118,7 +170,8 @@ static void asepid_action(const char *pid_str){
                         return;
                     }
             }
-        proc_create(pid_str, 0644, ase_parent, &asepid_proc_fops);
+        snprintf(pid_buffer, 10, "%lu", (long) pid);
+        proc_create(pid_buffer, 0644, ase_parent, &asepid_proc_fops);
 
         pid_array[pid_count] = pid_struct;
         pid_count++;
@@ -127,27 +180,6 @@ static void asepid_action(const char *pid_str){
         printk(KERN_EMERG "ASECMD: The PID value does not correspond to a existing PID\n");
     }
 }
-
-
-static int init_track_pid(struct file *file, const char __user *buff, size_t size, loff_t *data){
-    char *tmp = kmalloc(sizeof(char) * size, GFP_KERNEL);
-    int i;
-
-    printk(KERN_EMERG "ASECMD: PID Tracking begin\n");
-
-    if (size > (ASE_BUFFER_LEN - 1)) {
-        return -EINVAL;
-    }
-    for(i = 0; i < size-1; i++){
-        tmp[i] = buff[i];
-    }
-    tmp[i] = '\0';
-
-    asepid_action(tmp);
-
-    return size;
-}
-
 
 /**
  * Manage global module behaviour
