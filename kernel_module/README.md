@@ -16,7 +16,7 @@ PID TTY          TIME CMD
 1711 ttyS0    00:00:00 login
 1935 ttyS0    00:00:01 bash
 2088 ttyS0    00:00:00 ps
-root@debian-ase:/home/ase# echo 1935 > /proc/ase_cmd
+root@debian-ase:/home/ase# echo -n 1935 > /proc/ase_cmd
 [ 4753.358606] ASECMD: Write has been called
 [ 4753.362227] ASECMD: Entering the add_pid_action function.
 [ 4753.366314] ASECMD: PID find and added in the directory
