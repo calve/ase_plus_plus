@@ -18,7 +18,7 @@ MODULE_DESCRIPTION("ASE Project kernel");
 
 #define ASE_BUFFER_LEN 64
 #define PID_LEN 5
-#define MAX_PID 1024
+#define MAX_PID 8192
 
 long current_pid;
 
@@ -37,6 +37,7 @@ static int asepid_proc_open(struct inode *inode, struct file *file);
 static int asepid_proc_show(struct seq_file *m, void *v);
 static ssize_t asepid_proc_write(struct file *filp, const char __user *buff, size_t len, loff_t *data);
 static void asepid_action(long pid);
+extern struct task_struct *find_task_by_vpid(pid_t nr);
 
 
 /**
@@ -109,8 +110,32 @@ struct asepid_pid *pid_list = NULL;
 
 static int asepid_proc_show(struct seq_file *m, void *v)
 {
-    seq_printf(m, "PID : %ld\n", current_pid);
-    return 0;
+    //struct task_struct *task = current; // getting global current pointer
+    struct pid *pid_struct;
+    struct task_struct *task;
+    int i;
+    char procname[5];
+    char path[9];
+
+    printk(KERN_NOTICE "%ld\n", current_pid);
+    /* On vérifie que le fichier n'existe pas avant de le créer. */
+    for(i = 0 ; i < pid_count ; i++){
+            /* Warning si il existe. */
+            if((pid_struct = find_get_pid(current_pid)) != NULL){
+                    task = pid_task(pid_struct,PIDTYPE_PID);
+                    printk(KERN_NOTICE "assignment: current process: %s, PID: %d, start time:%ld\n", task->comm, task->pid, task->utime);
+                    return 0;
+            }
+    }
+    snprintf(procname, 5, "%li", current_pid);
+    printk(KERN_NOTICE "%s\n", procname);
+    strcat(path, "ase/");
+    strcat(path, procname);
+    printk(KERN_NOTICE "%s\n", path);
+    /* NOT WORKING BUT ALMOST */
+    remove_proc_entry(path, NULL);
+    printk(KERN_NOTICE "ASECMD_ERROR: Impossible to display the file (not existing)\n");
+    return 1;
 }
 
 static ssize_t
@@ -180,6 +205,10 @@ static void asepid_action(long pid){
         printk(KERN_EMERG "ASECMD: The PID value does not correspond to a existing PID\n");
     }
 }
+
+
+
+
 
 /**
  * Manage global module behaviour
