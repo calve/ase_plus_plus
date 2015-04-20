@@ -38,6 +38,14 @@ static int asepid_proc_show(struct seq_file *m, void *v);
 static ssize_t asepid_proc_write(struct file *filp, const char __user *buff, size_t len, loff_t *data);
 static void asepid_action(long pid);
 
+/* A structure to store the jiffie at which we started to track a pid */
+struct pid_tracker {
+    long pid;
+    unsigned long long first_jiffie;
+    struct pid_tracker* next;
+};
+
+struct pid_tracker* tracker_list = NULL;
 
 /**
  * Manage ``proc/ase_cmd`` file
@@ -109,8 +117,22 @@ struct asepid_pid *pid_list = NULL;
 
 static int asepid_proc_show(struct seq_file *m, void *v)
 {
-    seq_printf(m, "PID : %ld\n", current_pid);
-    return 0;
+    /* Find the corresponding pid_tracker */
+    struct pid_tracker* iterator = tracker_list->next;
+    do {
+        if (iterator->pid == current_pid){
+            long pid_jiffies;
+            pid_jiffies = get_jiffies_64() - iterator->first_jiffie;
+            seq_printf(m, "PID : %lu, jiffies %lu\n", current_pid, pid_jiffies);
+            return 0;
+        }
+        else if (iterator == tracker_list->next){
+            printk(KERN_EMERG "ASECMD: Cannot find PID in tracked list\n");
+            return -1;
+        }
+        iterator = iterator->next;
+    } while (iterator->next != tracker_list && iterator != tracker_list->next);
+    return -1;
 }
 
 static ssize_t
@@ -124,7 +146,7 @@ asepid_proc_write(struct file *filp, const char __user *buff,
 
 static int asepid_proc_open(struct inode *inode, struct file *file)
 {
-    /* What to do when user opens ``ase_cmd`` */
+    /* What to do when user opens  ``/proc/ase/<pid>`` */
     /*    printk(KERN_INFO "ASEPID: Opened file %s", path_get((const struct path*) file->f_path)); */
     switch(kstrtol(file->f_path.dentry->d_iname, 10, &current_pid)){
     case -ERANGE:
@@ -157,6 +179,7 @@ static void asepid_action(long pid){
     printk(KERN_EMERG "ASECMD: Entering the add_pid_action function.\n");
     if((pid_struct = find_get_pid(pid)) != NULL){
         char* pid_buffer;
+        struct pid_tracker* this;
         pid_buffer=kmalloc(sizeof(char) * 10, GFP_KERNEL); /* Pid should not be must than 10 digits long, ie 1^10 */
         printk(KERN_EMERG "ASECMD: PID find and added in the directory\n");
 
@@ -170,8 +193,31 @@ static void asepid_action(long pid){
                         return;
                     }
             }
+
+        /* Create ``/proc/ase/<pid>`` */
         snprintf(pid_buffer, 10, "%lu", (long) pid);
         proc_create(pid_buffer, 0644, ase_parent, &asepid_proc_fops);
+
+        /* Get current jiffie, and add this pid to the global process list */
+
+        this = kmalloc(sizeof(struct pid_tracker), GFP_KERNEL);
+        this->pid = pid;
+        this->first_jiffie = get_jiffies_64();
+        this->next = this;
+
+        if (tracker_list == NULL){
+            tracker_list = this;
+        }
+        else {
+            struct pid_tracker* iterator = tracker_list->next;
+            while (iterator->next != tracker_list){
+                iterator = iterator->next;
+            }
+            iterator->next = this;
+            this->next = tracker_list;
+        }
+
+        printk(KERN_EMERG "ASECMD: /proc/ase/%ld initialized at %llu\n", this->pid, this->first_jiffie);
 
         pid_array[pid_count] = pid_struct;
         pid_count++;
