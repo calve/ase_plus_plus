@@ -2,6 +2,7 @@
 #include <linux/kernel.h>
 #include <linux/module.h>
 #include <linux/proc_fs.h>
+#include <linux/kprobes.h>
 #include <linux/pid.h>
 #include <linux/seq_file.h>
 #include <linux/string.h>
@@ -37,7 +38,16 @@ struct proc_dir_entry *ase_parent, *asecmd_entry;
 static int asepid_proc_open(struct inode *inode, struct file *file);
 static int asepid_proc_show(struct seq_file *m, void *v);
 static ssize_t asepid_proc_write(struct file *filp, const char __user *buff, size_t len, loff_t *data);
+static void asepid_terminate_pid (int code);
 static void asepid_action(long pid);
+
+
+static struct jprobe jprobe_kill_task = {
+    .kp = {
+        .symbol_name = "do_exit",
+    },
+    .entry = (kprobe_opcode_t *) asepid_terminate_pid
+};
 
 /**
  * Manage ``proc/ase_cmd`` file
@@ -133,6 +143,28 @@ static int asepid_proc_open(struct inode *inode, struct file *file)
     return single_open(file, asepid_proc_show, NULL);
 }
 
+static void asepid_terminate_pid (int code){
+    struct task_struct *this = current;
+    int pid = this->pid;
+    char* pid_buffer;
+    int i = 0;
+    /* Verify existence of ``/proc/ase/<pid>`` */
+    for(i = 0 ; i < pid_count ; i++)
+        {
+            if((long int)(pid_array[i]->numbers[0].nr) == pid)
+                {
+                    pid_buffer=kmalloc(sizeof(char) * 10, GFP_KERNEL); /* Pid should not be must than 10 digits long, ie 1^10 */
+                    snprintf(pid_buffer, 10, "/proc/ase/%d", pid);
+                    remove_proc_entry(pid_buffer, NULL);
+                    printk(KERN_EMERG "ASECMD: %s removed.\n", pid_buffer);
+                    return;
+                }
+        }
+    jprobe_return();
+    return;
+}
+
+
 
 static const struct file_operations asepid_proc_fops = {
     .owner      = THIS_MODULE,
@@ -171,8 +203,6 @@ static void asepid_action(long pid){
         snprintf(pid_buffer, 10, "%lu", (long) pid);
         proc_create(pid_buffer, 0644, ase_parent, &asepid_proc_fops);
 
-        /* Get current jiffie, and add this pid to the global process list */
-
         pid_array[pid_count] = pid_struct;
         pid_count++;
     }
@@ -200,6 +230,9 @@ ase_proc_init(void)
             printk(KERN_INFO "Error creating proc entry\n");
             return -ENOMEM;
         }
+    register_jprobe(&jprobe_kill_task);
+    printk(KERN_ALERT "plant jprobe at %p, handler addr %p\n",
+           jprobe_kill_task.kp.addr, jprobe_kill_task.entry);
     printk(KERN_INFO "Ase initialized\n");
     return 0;
 }
