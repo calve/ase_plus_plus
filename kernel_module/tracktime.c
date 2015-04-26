@@ -38,7 +38,7 @@ struct proc_dir_entry *ase_parent, *asecmd_entry;
 static int asepid_proc_open(struct inode *inode, struct file *file);
 static int asepid_proc_show(struct seq_file *m, void *v);
 static ssize_t asepid_proc_write(struct file *filp, const char __user *buff, size_t len, loff_t *data);
-static void asepid_terminate_pid (int code);
+static void asepid_terminate_pid (long code);
 static void asepid_action(long pid);
 
 
@@ -143,7 +143,7 @@ static int asepid_proc_open(struct inode *inode, struct file *file)
     return single_open(file, asepid_proc_show, NULL);
 }
 
-static void asepid_terminate_pid (int code){
+static void asepid_terminate_pid (long code){
     struct task_struct *this = current;
     int pid = this->pid;
     char* pid_buffer;
@@ -154,8 +154,8 @@ static void asepid_terminate_pid (int code){
             if((long int)(pid_array[i]->numbers[0].nr) == pid)
                 {
                     pid_buffer=kmalloc(sizeof(char) * 10, GFP_KERNEL); /* Pid should not be must than 10 digits long, ie 1^10 */
-                    snprintf(pid_buffer, 10, "/proc/ase/%d", pid);
-                    remove_proc_entry(pid_buffer, NULL);
+                    snprintf(pid_buffer, 20, "%d", pid);
+                    remove_proc_entry(pid_buffer, ase_parent);
                     printk(KERN_EMERG "ASECMD: %s removed.\n", pid_buffer);
                     return;
                 }
