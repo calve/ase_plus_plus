@@ -49,3 +49,8 @@ PID : 1936, jiffies 7929
 root@debian-ase:/home/ase# cat /proc/ase/1936
 PID : 1936, jiffies 8496
 ```
+
+# What works
+
+  + process creation
+  + delete /proc/ase/<pid> entry on process exit
